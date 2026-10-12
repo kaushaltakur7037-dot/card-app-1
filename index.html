@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Khali Card</title>
+<style>
+  :root {
+    --bg: #eef1f6; --panel: #ffffff; --text: #1b2230; --muted: #5d6779;
+    --line: #d5dbe6; --accent: #1f5eff; --accent-text: #ffffff; --danger: #c0392b;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161f; --panel: #1c2230; --text: #e9edf5; --muted: #9aa5b8;
+      --line: #323b50; --accent: #6c93ff; --accent-text: #0c1020; --danger: #ff7b6b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161f; --panel: #1c2230; --text: #e9edf5; --muted: #9aa5b8;
+    --line: #323b50; --accent: #6c93ff; --accent-text: #0c1020; --danger: #ff7b6b;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, "Noto Sans", "Noto Sans Devanagari", "Nirmala UI", Roboto, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 18px 16px 40px; }
+  h1 { font-size: 1.4rem; margin: 4px 0 2px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: .95rem; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .field { margin-bottom: 13px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-weight: 600; margin-bottom: 5px; font-size: .93rem; }
+  textarea { width: 100%; font: inherit; color: var(--text); background: transparent; border: 1.5px solid var(--line); border-radius: 9px; padding: 11px 12px; resize: vertical; min-height: 70px; }
+  input[type="file"] { width: 100%; font: inherit; color: var(--text); }
+  input[type="color"] { width: 64px; height: 42px; border: 1.5px solid var(--line); border-radius: 9px; background: transparent; padding: 3px; }
+  textarea:focus, button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+  .row-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { font: inherit; cursor: pointer; }
+  .row-btns button { min-width: 48px; height: 46px; padding: 0 14px; border-radius: 10px; border: 1.5px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; }
+  .row-btns button:disabled { opacity: .4; cursor: default; }
+  .row-btns .danger { border-color: var(--danger); color: var(--danger); }
+  input[type="range"] { width: 100%; height: 36px; accent-color: var(--accent); }
+  select { width: 100%; font: inherit; color: var(--text); background: var(--panel); border: 1.5px solid var(--line); border-radius: 9px; padding: 11px 12px; }
+  select:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+  .chk { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-weight: 600; }
+  .chk input { width: 22px; height: 22px; accent-color: var(--accent); }
+  input[type="number"] { width: 100%; font: inherit; color: var(--text); background: transparent; border: 1.5px solid var(--line); border-radius: 9px; padding: 8px 8px; }
+  .color-row { display: grid; grid-template-columns: 64px 1fr auto; gap: 8px; align-items: center; }
+  .color-row input[type="text"] { width: 100%; font: inherit; color: var(--text); background: transparent; border: 1.5px solid var(--line); border-radius: 9px; padding: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .mini { height: 42px; padding: 0 12px; border: 1.5px solid var(--accent); background: transparent; color: var(--accent); border-radius: 9px; font: inherit; font-weight: 700; cursor: pointer; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .sw { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0; }
+  .sw.saved { border-radius: 8px; }
+  .num-row { display: grid; grid-template-columns: 1fr 78px 16px; gap: 8px; align-items: center; }
+  .pos-row { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 8px; align-items: center; font-size: .9rem; }
+  .ph { font-size: 1.05rem; margin: 0 0 6px; }
+  #gridLayer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; background-image: linear-gradient(to right, rgba(214,0,110,.45) 1px, transparent 1px), linear-gradient(to bottom, rgba(214,0,110,.45) 1px, transparent 1px), linear-gradient(to right, rgba(214,0,110,.16) 1px, transparent 1px), linear-gradient(to bottom, rgba(214,0,110,.16) 1px, transparent 1px); background-size: 100px 100px, 100px 100px, 50px 50px, 50px 50px; }
+  .gl { position: absolute; font-size: 15px; font-weight: 700; line-height: 1; color: #d6006e; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; }
+  #tagLayer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; display: none; }
+  .tag { position: absolute; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 13px; background: #ff9800; color: #fff; font: 700 14px/26px system-ui, sans-serif; text-align: center; white-space: nowrap; transform: translate(-13px, -13px); box-shadow: 0 0 0 2px #fff; }
+  .tag.text { background: #1f5eff; }
+  .tag.sel { background: #d6006e; }
+  .lrow { display: block; width: 100%; text-align: left; font: inherit; font-size: .9rem; color: var(--text); background: transparent; border: 1.5px solid var(--line); border-radius: 9px; padding: 9px 10px; margin-bottom: 6px; cursor: pointer; }
+  .lrow.on { border-color: var(--accent); background: rgba(31, 94, 255, .10); font-weight: 700; }
+  .loc-row { display: grid; grid-template-columns: 34px 1fr 1fr auto auto; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .lbl { display: block; font-weight: 600; margin-bottom: 6px; font-size: .93rem; }
+  .file-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; opacity: 0; }
+  .field label.filebtn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 56px; padding: 12px 16px; margin: 0; border: 2px dashed var(--accent); border-radius: 12px; background: rgba(31, 94, 255, .08); color: var(--accent); font-weight: 700; font-size: 1rem; cursor: pointer; text-align: center; }
+  .field label.filebtn:hover, .field label.filebtn:active { background: rgba(31, 94, 255, .16); }
+  .file-hidden:focus-visible + label.filebtn { outline: 3px solid var(--accent); outline-offset: 2px; }
+  #cropModal, #pickModal, #finalModal { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(0,0,0,.6); display: flex; justify-content: center; overflow: auto; padding: 16px; padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  #cropModal[hidden], #pickModal[hidden], #finalModal[hidden] { display: none; }
+  #finalModal .cm-box { max-width: 720px; }
+  .cm-box { background: var(--panel); color: var(--text); width: 100%; max-width: 480px; border-radius: 14px; padding: 16px; margin: auto; }
+  .cm-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
+  #cmFrame { box-sizing: content-box; position: relative; overflow: hidden; margin: 0 auto 14px; border: 2px solid var(--accent); background: #8a8f9a; touch-action: none; cursor: grab; }
+  #cmImg { position: absolute; max-width: none; max-height: none; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  #cmOk { background: var(--accent); color: var(--accent-text); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
+  .tab { font: inherit; cursor: pointer; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--line); background: transparent; color: var(--text); font-weight: 600; }
+  .tab.on { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  #cardName { width: 100%; font: inherit; color: var(--text); background: transparent; border: 1.5px solid var(--line); border-radius: 9px; padding: 11px 12px; }
+  #pkOk { background: var(--accent); color: var(--accent-text); }
+  #printArea { display: none; }
+  #printArea .pimg { display: block; width: 100%; height: auto; max-height: 100vh; object-fit: contain; break-after: page; page-break-after: always; }
+  #printArea .pimg:last-child { break-after: auto; page-break-after: auto; }
+  .pcard { position: relative; width: 1016px; height: 638px; overflow: hidden; background: #ffffff; font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, "Segoe UI", system-ui, Arial, sans-serif; break-after: page; page-break-after: always; }
+  .pcard:last-child { break-after: auto; page-break-after: auto; }
+  #stage3d { position: relative; width: 100%; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+  #scaler3d { position: absolute; left: 0; top: 15px; width: 1016px; height: 638px; transform-origin: 0 0; perspective: 2600px; }
+  #card3d { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+  .layer3 { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #c9cfdb; }
+  .face3 { position: absolute; left: 0; top: 0; width: 1016px; height: 638px; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #ffffff; display: block; pointer-events: none; }
+  .f3front { transform: translateZ(9px); }
+  .f3back { transform: rotateY(180deg) translateZ(9px); }
+  #b3Save { background: var(--accent); color: var(--accent-text); }
+  .crop-row { display: grid; grid-template-columns: 78px 1fr 64px 14px; align-items: center; gap: 6px; margin-bottom: 4px; font-size: .9rem; }
+  .hint { color: var(--muted); font-size: .85rem; margin: 0 0 10px; }
+  .sel-name { font-weight: 700; margin-bottom: 10px; }
+  .section-title { font-weight: 700; margin: 22px 0 10px; font-size: 1.05rem; }
+
+  #stage { width: 100%; overflow: hidden; }
+  #scaler { width: 1016px; height: 638px; transform-origin: 0 0; }
+  #card { position: relative; width: 1016px; height: 638px; background: #ffffff; overflow: hidden; box-shadow: 0 2px 14px rgba(20, 30, 60, .18); font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, "Segoe UI", system-ui, Arial, sans-serif; }
+  .item { position: absolute; transform-origin: 0 0; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; white-space: pre; line-height: 1.25; font-size: 40px; font-weight: 600; padding: 2px 4px; }
+  .item.img { padding: 0; box-sizing: content-box; }
+  .item.img img { display: block; width: 100%; height: auto; pointer-events: none; }
+  .item.sel { outline: 3px dashed #ff9800; outline-offset: 3px; cursor: grabbing; z-index: 50; }
+
+  .actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .actions button { flex: 1 1 160px; padding: 13px 16px; border-radius: 10px; font-weight: 700; border: 1.5px solid var(--accent); }
+  .primary { background: var(--accent); color: var(--accent-text); }
+  .secondary { background: transparent; color: var(--accent); }
+  .reset { background: transparent; color: var(--muted); border-color: var(--line) !important; }
+  .note { color: var(--muted); font-size: .85rem; margin-top: 10px; min-height: 1.2em; }
+
+  @page { size: 1016px 638px; margin: 0; }
+  @media print {
+    :root { padding: 0; }
+    body { background: #fff; }
+    .wrap > :not(#stage) { display: none !important; }
+    .wrap { padding: 0; max-width: none; }
+    #stage { height: auto !important; overflow: visible !important; }
+    #scaler { transform: none !important; position: absolute; left: 0; top: 0; }
+    #card { box-shadow: none; }
+    .item.sel { outline: none !important; }
+    #gridLayer, #tagLayer { display: none !important; }
+    #cropModal, #pickModal, #finalModal { display: none !important; }
+    body.printing .wrap { display: none !important; }
+    body.printing #printArea { display: block; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Khali Card (1016 × 638)</h1>
+  <p class="sub">Safed khali card. Photo aur text aap khud jodo aur apni jagah rakho.</p>
+
+  <div class="panel">
+    <div class="field">
+      <span class="lbl">Photo ya image jodo</span>
+      <input type="file" id="photoPick" class="file-hidden" accept="image/*">
+      <label for="photoPick" class="filebtn">&#128247; Photo chuno (gallery / file)</label>
+      <div class="hint" style="margin:6px 0 0">Photo chunne ke baad kaatne ka size chun sakte ho. Pichli photo hatai ho to nayi wahin lagegi.</div>
+    </div>
+    <div class="row-btns" style="margin-bottom:13px">
+      <button type="button" id="addText">+ Text jodo</button>
+    </div>
+    <div class="field">
+      <label for="bgColor">Card ka rang</label>
+      <div class="color-row"><input type="color" id="bgColor" value="#ffffff"><input type="text" id="bgHex" maxlength="7" value="#FFFFFF" placeholder="#RRGGBB" autocomplete="off" aria-label="Card ke rang ka hex code"><button type="button" class="mini" id="bgSave">Save</button></div>
+      <div class="swatches" id="bgSw"></div>
+      <button type="button" class="mini" id="clearSaved" style="margin-top:10px">Meri save kiye rang saaf karo</button>
+    </div>
+  </div>
+
+  <div class="section-title" id="cardTitle">Card (preview)</div>
+  <div class="hint" id="saveStatus" role="status" aria-live="polite" style="margin:-4px 0 10px">Har badlav apne aap save hota hai. Purana kaam laana ho to sabse neeche Backup se wapas lao.</div>
+  <div class="row-btns" style="margin:0 0 10px"><button type="button" class="undoBtn" disabled>↶ Undo</button><button type="button" class="redoBtn" disabled>↷ Redo</button></div>
+  <div class="tabs" id="cardTabs"></div>
+  <div class="row-btns" style="margin:0 0 10px">
+    <button type="button" id="cardNew">+ Naya khali card</button>
+    <button type="button" id="cardCopy">Is card ki copy</button>
+    <button type="button" id="cardDel" class="danger">Card hatao</button>
+  </div>
+  <div class="field"><label for="cardName">Is card ka naam</label><input type="text" id="cardName" maxlength="24" autocomplete="off"></div>
+  <label class="chk" style="margin:0 0 6px"><input type="checkbox" id="showGrid"> Jaali (lakeer) dikhao</label>
+  <label class="chk" style="margin:0 0 10px"><input type="checkbox" id="showTags"> Number dikhao: Photo P1, P2... aur Text T1, T2... (sirf dekhne ke liye, image mein nahi aayenge)</label>
+  <div id="stage"><div id="scaler"><div id="card"></div></div></div>
+
+  <div class="panel" style="margin-top:14px">
+    <p class="hint">Cheez ko ungli se pakad kar khiso. Dabane par wo chun li jati hai. Do ungli se pinch karke zoom karo, ya neeche ke slider se.</p>
+    <div class="row-btns" style="margin-bottom:12px"><button type="button" class="undoBtn" disabled>↶ Undo</button><button type="button" class="redoBtn" disabled>↷ Redo</button></div>
+    <div class="sel-name" id="selName">Abhi kuch chuna nahi hai</div>
+    <div class="field" id="textBox" hidden>
+      <label for="selText">Text badlo</label>
+      <textarea id="selText"></textarea>
+    </div>
+    <div class="field" id="colorBox" hidden>
+      <label for="selColor">Text ka rang</label>
+      <div class="color-row"><input type="color" id="selColor" value="#111111"><input type="text" id="selHex" maxlength="7" value="#111111" placeholder="#RRGGBB" autocomplete="off" aria-label="Text ke rang ka hex code"><button type="button" class="mini" id="selSave">Save</button></div>
+      <div class="swatches" id="selSw"></div>
+    </div>
+    <div class="field" id="fontBox" hidden>
+      <label for="selFont">Font (Hindi / English)</label>
+      <select id="selFont"></select>
+      <label class="chk"><input type="checkbox" id="selBold"> Mota (Bold)</label>
+    </div>
+    <div class="field">
+      <label for="sizeRange">Zoom (bada-chhota)</label>
+      <div class="num-row"><input type="range" id="sizeRange" min="20" max="400" value="100" disabled><input type="number" id="sizeNum" min="20" max="400" step="1" aria-label="Zoom percent" disabled><b>%</b></div>
+    </div>
+    <div class="field">
+      <label>Jagah (card par, pixel mein)</label>
+      <div class="pos-row"><span>X</span><input type="number" id="posX" min="0" max="986" step="1" aria-label="X position" disabled><span>Y</span><input type="number" id="posY" min="0" max="618" step="1" aria-label="Y position" disabled></div>
+      <div class="pos-row" style="margin-top:8px"><span>Tir ka kadam</span><input type="number" id="stepNum" min="1" max="100" step="1" value="4" aria-label="Tir ka kadam pixel mein"><span>px</span><span></span></div>
+      <div class="hint" id="infoLine" style="margin:8px 0 0"></div>
+    </div>
+    <div class="field" id="borderBox" hidden>
+      <label>Border (kinara) lagao (0.1 px se shuru, likh bhi sakte ho)</label>
+      <div class="num-row"><input type="range" id="bwRange" min="0" max="60" step="0.1" value="0"><input type="number" id="bwNum" min="0" max="60" step="0.1" aria-label="Border ki motai pixel"><b>px</b></div>
+      <div class="row-btns" style="margin-top:8px"><button type="button" id="bwM1">&minus;1</button><button type="button" id="bwM01">&minus;0.1</button><button type="button" id="bwP01">+0.1</button><button type="button" id="bwP1">+1</button></div>
+      <div class="color-row" style="margin-top:10px"><input type="color" id="bcColor" value="#000000"><input type="text" id="bcHex" maxlength="7" value="#000000" placeholder="#RRGGBB" autocomplete="off" aria-label="Border ke rang ka hex code"><button type="button" class="mini" id="bcSave">Save</button></div>
+      <div class="swatches" id="bcSw"></div>
+      <div class="row-btns" style="margin-top:10px"><button type="button" id="bwAll">Sab photo par yahi border lagao</button></div>
+    </div>
+    <div class="field" id="cropBox" hidden>
+      <label>Photo ko kaato (crop)</label>
+      <div class="crop-row"><span>Upar se</span><input type="range" id="cropT" min="0" max="80" value="0"><input type="number" id="cropTn" min="0" max="80" step="1" value="0" aria-label="Upar se crop percent"><b>%</b></div>
+      <div class="crop-row"><span>Neeche se</span><input type="range" id="cropB" min="0" max="80" value="0"><input type="number" id="cropBn" min="0" max="80" step="1" value="0" aria-label="Neeche se crop percent"><b>%</b></div>
+      <div class="crop-row"><span>Left se</span><input type="range" id="cropL" min="0" max="80" value="0"><input type="number" id="cropLn" min="0" max="80" step="1" value="0" aria-label="Left se crop percent"><b>%</b></div>
+      <div class="crop-row"><span>Right se</span><input type="range" id="cropR" min="0" max="80" value="0"><input type="number" id="cropRn" min="0" max="80" step="1" value="0" aria-label="Right se crop percent"><b>%</b></div>
+      <div class="row-btns" style="margin-top:6px"><button type="button" id="cropReset">Crop hatao</button></div>
+    </div>
+    <div class="row-btns">
+      <button type="button" id="nL" aria-label="Left" disabled>&larr;</button>
+      <button type="button" id="nU" aria-label="Up" disabled>&uarr;</button>
+      <button type="button" id="nD" aria-label="Down" disabled>&darr;</button>
+      <button type="button" id="nR" aria-label="Right" disabled>&rarr;</button>
+      <button type="button" id="sMinus" aria-label="Chhota karo" disabled>&minus;20%</button>
+      <button type="button" id="sPlus" aria-label="Bada karo" disabled>+20%</button>
+      <button type="button" id="del" class="danger" disabled>Hatao</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="ph">Cheezon ki list (number aur jagah)</h2>
+    <p class="hint">Har cheez ka number card par bhi dikhta hai. List mein dabane se wo cheez chun li jayegi.</p>
+    <div id="itemList"></div>
+  </div>
+
+  <div class="panel">
+    <h2 class="ph">Meri jagah (location number)</h2>
+    <p class="hint">Jagah save karo, phir kisi bhi cheez ko ek dabav mein wahin laga do. Jagah ke number badal kar bhi theek kar sakte ho.</p>
+    <div class="field">
+      <label for="anchorSel">Cheez ka kaun sa hissa jagah par baithe</label>
+      <select id="anchorSel"><option value="tl">Upar-left kona</option><option value="c">Beech (center)</option></select>
+    </div>
+    <div class="row-btns" style="margin-bottom:12px"><button type="button" id="locFromSel" disabled>Chuni cheez ki jagah save karo</button></div>
+    <div class="pos-row" style="margin-bottom:8px"><span>X</span><input type="number" id="newLocX" min="0" max="1016" step="1" value="508" aria-label="Nayi jagah X"><span>Y</span><input type="number" id="newLocY" min="0" max="638" step="1" value="319" aria-label="Nayi jagah Y"></div>
+    <div class="row-btns" style="margin-bottom:14px"><button type="button" id="locAdd">+ Ye number se nayi jagah jodo</button></div>
+    <div id="locList"></div>
+  </div>
+
+  <div class="section-title">3D card (aage ek card, peeche dusra card)</div>
+  <div class="panel">
+    <div class="pos-row"><span>Aage</span><select id="sel3dFront" aria-label="Aage ka card"></select><span>Peeche</span><select id="sel3dBack" aria-label="Peeche ka card"></select></div>
+    <p class="hint" style="margin:10px 0 8px">Card ko ungli se ghumao. Jab peeche wala card edit karte ho to 3D card apne aap palat kar uska hissa dikhata hai, aur editing saath-saath dikhti hai.</p>
+    <div id="stage3d"><div id="scaler3d"><div id="card3d">
+      <img class="face3 f3front" id="f3d" alt="Aage ka card">
+      <img class="face3 f3back" id="b3d" alt="Peeche ka card">
+    </div></div></div>
+    <div class="row-btns" style="margin-top:12px">
+      <button type="button" id="b3Flip">Palto (peeche dekho)</button>
+      <button type="button" id="b3Reset">Seedha karo</button>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label for="bg3d">3D image ka background</label>
+      <select id="bg3d"><option value="none">Transparent (kuch nahi)</option><option value="#ffffff">Safed</option><option value="#e9edf5">Halka neela-grey</option></select>
+    </div>
+    <div class="row-btns"><button type="button" id="b3Save">3D image save karo</button></div>
+  </div>
+
+  <div class="field" style="margin-top:16px">
+    <label for="pdfDpi">PDF ka naap (PDF ka page = card)</label>
+    <select id="pdfDpi">
+      <option value="300">Card ka asli naap (86 x 54 mm)</option>
+      <option value="96">Bada, screen jitna (269 x 169 mm)</option>
+    </select>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="btnImage">Image save karo</button>
+    <button class="secondary" id="btnFinal">Final dekho</button>
+    <button class="secondary" id="btnPdf">PDF save karo</button>
+    <button class="secondary" id="btnPrint">Print karo</button>
+    <button class="reset" id="btnClear">Is card ko khaali karo</button>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h2 class="ph">Backup (poora kaam ek file mein)</h2>
+    <p class="hint">Isse aapke saare card, photo, text, jagah aur rang ek file mein save ho jate hain. Us file ko kisi bhi jagah khule is app mein wapas la sakte ho, jaise naye phone par ya index.html file se khole app mein.</p>
+    <div class="row-btns"><button type="button" id="bkSave">Backup save karo</button></div>
+    <div class="field" style="margin-top:12px">
+      <input type="file" id="bkFile" class="file-hidden" accept=".json,application/json">
+      <label for="bkFile" class="filebtn">Backup se wapas lao (file chuno)</label>
+    </div>
+  </div>
+
+  <div class="note" id="note" role="status"></div>
+  <div class="hint" style="margin-top:14px">Version 19 (Backup / Restore)</div>
+</div>
+
+<div id="pickModal" hidden>
+  <div class="cm-box" role="dialog" aria-modal="true" aria-label="Card chuno">
+    <div class="cm-title" id="pkTitle">Kaun sa card?</div>
+    <p class="hint">Ek ya zyada card chun sakte ho.</p>
+    <div id="pkList"></div>
+    <div class="row-btns" style="margin-top:14px">
+      <button type="button" id="pkOk">OK</button>
+      <button type="button" id="pkAll">Sab chuno</button>
+      <button type="button" id="pkCancel">Raddh karo</button>
+    </div>
+  </div>
+</div>
+
+<div id="finalModal" hidden>
+  <div class="cm-box" role="dialog" aria-modal="true" aria-label="Final card">
+    <div class="cm-title" id="fnTitle">Final card</div>
+    <p class="hint">Download aur print mein bilkul yahi aayega.</p>
+    <img id="finalImg" alt="Final card" style="width:100%;height:auto;display:block;border:1px solid var(--line)">
+    <div class="row-btns" style="margin-top:14px"><button type="button" id="fnClose">Band karo</button></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<div id="cropModal" hidden>
+  <div class="cm-box" id="cmBox" role="dialog" aria-modal="true" aria-label="Photo kaato">
+    <div class="cm-title">Photo kaato aur card par lagao</div>
+    <p class="hint">Photo ko ungli se khiso, do ungli se zoom karo, ya neeche ke slider se.</p>
+    <div id="cmFrame"><img id="cmImg" alt=""></div>
+    <div class="field">
+      <label for="cmPreset">Kaatne ka size</label>
+      <select id="cmPreset">
+        <option value="free">Poori photo (bina kaate)</option>
+        <option value="sq">Square 1:1</option>
+        <option value="pass">Passport photo 35 x 45 mm</option>
+        <option value="stamp">Stamp size 20 x 25 mm</option>
+        <option value="p34">Portrait 3:4</option>
+        <option value="l43">Landscape 4:3</option>
+        <option value="l169">Wide 16:9</option>
+        <option value="wide">Lambi patti 3:1</option>
+        <option value="custom">Apna size (chaudai x unchai likho)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Card par size (pixel mein)</label>
+      <div class="pos-row"><span>Chaudai</span><input type="number" id="cmW" min="20" max="1016" step="1" aria-label="Chaudai pixel"><span>Unchai</span><input type="number" id="cmH" min="20" max="638" step="1" aria-label="Unchai pixel"></div>
+    </div>
+    <div class="field">
+      <label for="cmZoom">Photo ke andar zoom</label>
+      <input type="range" id="cmZoom" min="100" max="400" value="100">
+    </div>
+    <div class="field">
+      <label for="cmWhere">Kahan lagani hai</label>
+      <select id="cmWhere"></select>
+    </div>
+    <div class="row-btns">
+      <button type="button" id="cmOk">Card par lagao</button>
+      <button type="button" id="cmCancel">Raddh karo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  var card = $('card');
+  var note = $('note');
+  var items = [];
+  var els = {};
+  var nextId = 1;
+  var selected = null;
+  var drag = null;
+  var scale = 1;
+  var pointers = {};
+  var pinch = null;
+  var saveTimer = null;
+
+  var FONTS_HINDI = [['Noto Sans Devanagari', 1], ['Hind', 1], ['Mukta', 1], ['Poppins', 1], ['Baloo 2', 1], ['Kalam', 1], ['Tiro Devanagari Hindi', 0], ['Rozha One', 0], ['Yatra One', 0], ['Amita', 1], ['Khand', 1], ['Eczar', 1]];
+  var FONTS_ENG = [['Roboto', 1], ['Open Sans', 1], ['Montserrat', 1], ['Lato', 1], ['Oswald', 1], ['Playfair Display', 1], ['Merriweather', 1], ['Bebas Neue', 0], ['Anton', 0], ['Pacifico', 0], ['Lobster', 0], ['Dancing Script', 1], ['Caveat', 1], ['Courier Prime', 1]];
+  var FONTS_SYS = ['Arial', 'Georgia', 'Times New Roman'];
+  var FONT_OK = {};
+
+  (function initFonts() {
+    var sel = $('selFont');
+    function group(label, names) {
+      var g = document.createElement('optgroup');
+      g.label = label;
+      names.forEach(function (n) {
+        FONT_OK[n] = true;
+        var o = document.createElement('option');
+        o.value = n; o.textContent = n;
+        g.appendChild(o);
+      });
+      sel.appendChild(g);
+    }
+    var d = document.createElement('option');
+    d.value = ''; d.textContent = 'Default (Hindi + English)';
+    sel.appendChild(d);
+    group('Hindi (देवनागरी)', FONTS_HINDI.map(function (f) { return f[0]; }));
+    group('English', FONTS_ENG.map(function (f) { return f[0]; }).concat(FONTS_SYS));
+    FONTS_HINDI.concat(FONTS_ENG).forEach(function (f) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=' + f[0].replace(/ /g, '+') + (f[1] ? ':wght@400;700' : '') + '&display=swap';
+      document.head.appendChild(l);
+    });
+  })();
+
+  function applyText(it, el) {
+    el = el || els[it.id];
+    el.style.color = it.color;
+    el.style.fontFamily = (it.font && FONT_OK[it.font])
+      ? '"' + it.font + '", "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif' : '';
+    if (typeof it.bold === 'boolean') el.style.fontWeight = it.bold ? '700' : '400';
+  }
+
+  function loadUsedFonts() {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    var jobs = [];
+    items.forEach(function (it) {
+      if (it.type === 'text' && it.font) {
+        jobs.push(document.fonts.load((it.bold ? '700' : '400') + ' 40px "' + it.font + '"', it.text || 'A').catch(function () {}));
+      }
+    });
+    return Promise.all(jobs).then(function () { return document.fonts.ready; }).catch(function () {});
+  }
+
+  var PRESETS = ['#000000', '#ffffff', '#d00000', '#ff9933', '#f5b700', '#138808', '#1f5eff', '#000080', '#6a1b9a', '#e91e63', '#795548', '#607d8b'];
+  var savedColors = [];
+  function isHexColor(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c); }
+  function normHex(v) {
+    v = String(v).trim();
+    if (v.charAt(0) !== '#') v = '#' + v;
+    if (/^#[0-9a-fA-F]{3}$/.test(v)) v = '#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+    return /^#[0-9a-fA-F]{6}$/.test(v) ? v.toLowerCase() : null;
+  }
+  try {
+    var rawC = JSON.parse(localStorage.getItem('blankcard-colors') || '[]');
+    if (Array.isArray(rawC)) savedColors = rawC.filter(isHexColor).slice(-12);
+  } catch (e) {}
+  function persistColors() {
+    try { localStorage.setItem('blankcard-colors', JSON.stringify(savedColors)); } catch (e) {}
+  }
+  var colorWidgets = [];
+  function setupColor(o) {
+    var pick = $(o.pick), hex = $(o.hex), sw = $(o.sw);
+    function renderSw() {
+      sw.innerHTML = '';
+      PRESETS.concat(savedColors).forEach(function (c, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'sw' + (i >= PRESETS.length ? ' saved' : '');
+        b.style.background = c;
+        b.setAttribute('aria-label', 'Rang ' + c.toUpperCase());
+        b.addEventListener('click', function () {
+          pick.value = c;
+          hex.value = c.toUpperCase();
+          o.apply(c);
+        });
+        sw.appendChild(b);
+      });
+    }
+    pick.addEventListener('input', function () { hex.value = this.value.toUpperCase(); });
+    hex.addEventListener('input', function () {
+      var c = normHex(this.value);
+      if (c) { pick.value = c; o.apply(c); }
+    });
+    hex.addEventListener('change', function () {
+      var c = normHex(this.value);
+      this.value = (c || pick.value).toUpperCase();
+    });
+    $(o.save).addEventListener('click', function () {
+      var c = pick.value.toLowerCase();
+      if (PRESETS.indexOf(c) === -1 && savedColors.indexOf(c) === -1) {
+        savedColors.push(c);
+        if (savedColors.length > 12) savedColors.shift();
+        persistColors();
+        colorWidgets.forEach(function (w) { w.renderSw(); });
+      }
+      say('Rang ' + c.toUpperCase() + ' save ho gaya.');
+    });
+    var w = { renderSw: renderSw };
+    colorWidgets.push(w);
+    renderSw();
+  }
+  setupColor({ pick: 'selColor', hex: 'selHex', save: 'selSave', sw: 'selSw', apply: function (c) {
+    var it = find(selected);
+    if (!it || it.type !== 'text') return;
+    it.color = c;
+    applyText(it);
+    scheduleSave();
+  } });
+  setupColor({ pick: 'bgColor', hex: 'bgHex', save: 'bgSave', sw: 'bgSw', apply: function (c) {
+    card.style.background = c;
+    scheduleSave();
+  } });
+  $('clearSaved').addEventListener('click', function () {
+    savedColors = [];
+    persistColors();
+    colorWidgets.forEach(function (w) { w.renderSw(); });
+    say('Save kiye hue rang saaf ho gaye.');
+  });
+
+  var savePending = false;
+
+  function idbOpen() {
+    return new Promise(function (resolve, reject) {
+      var r = indexedDB.open('blankcard', 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore('kv'); };
+      r.onsuccess = function () { resolve(r.result); };
+      r.onerror = function () { reject(r.error); };
+    });
+  }
+  function idbSet(key, val) {
+    return idbOpen().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction('kv', 'readwrite');
+        if (val === null) tx.objectStore('kv').delete(key); else tx.objectStore('kv').put(val, key);
+        tx.oncomplete = function () { db.close(); resolve(); };
+        tx.onerror = function () { db.close(); reject(tx.error); };
+      });
+    });
+  }
+  function idbGet(key) {
+    return idbOpen().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var rq = db.transaction('kv', 'readonly').objectStore('kv').get(key);
+        rq.onsuccess = function () { db.close(); resolve(rq.result || null); };
+        rq.onerror = function () { db.close(); reject(rq.error); };
+      });
+    });
+  }
+
+  function stamp() {
+    var d = new Date();
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  function saveStatus(msg, bad) {
+    var el = $('saveStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = bad ? '#c0392b' : '';
+  }
+
+  function saveState() {
+    savePending = false;
+    var json;
+    try {
+      commitCur();
+      json = JSON.stringify({ cards: cards, cur: curCard, grid: $('showGrid').checked, tags: $('showTags').checked });
+    } catch (e) {
+      saveStatus('Save nahi ho paya!', true);
+      return;
+    }
+    try {
+      localStorage.setItem('blankcard-v2', json);
+      localStorage.removeItem('blankcard-v1');
+      saveStatus('\u2713 Sab save hai (' + stamp() + ')');
+      if (window.indexedDB) idbSet('state', null).catch(function () {});
+    } catch (e) {
+      try { localStorage.removeItem('blankcard-v2'); } catch (e2) {}
+      if (!window.indexedDB) {
+        saveStatus('Jagah bhar gayi, save nahi ho paya! Kam ya chhoti photo rakho.', true);
+        return;
+      }
+      idbSet('state', json).then(function () {
+        saveStatus('\u2713 Sab save hai (' + stamp() + ')');
+      }, function () {
+        saveStatus('Jagah bhar gayi, save nahi ho paya! Kam ya chhoti photo rakho.', true);
+      });
+    }
+  }
+  function flushSave() {
+    if (!savePending) return;
+    clearTimeout(saveTimer);
+    saveState();
+  }
+  function scheduleSave() {
+    if (showNums) refreshNums();
+    savePending = true;
+    schedule3d();
+    scheduleHist();
+    saveStatus('Save ho raha hai...');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveState, 120);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') flushSave();
+  });
+  window.addEventListener('pagehide', flushSave);
+  window.addEventListener('beforeunload', flushSave);
+
+  function isNum(v) { return typeof v === 'number' && isFinite(v); }
+  function validItem(it) {
+    if (!it || typeof it !== 'object') return false;
+    if (!['id', 'x', 'y', 's'].every(function (k) { return isNum(it[k]); })) return false;
+    if (it.type === 'text') return typeof it.text === 'string' && /^#[0-9a-fA-F]{6}$/.test(it.color);
+    if (it.type === 'img') {
+      return ['w', 'nw', 'nh', 'cl', 'ct', 'cr', 'cb'].every(function (k) { return isNum(it[k]); }) &&
+        typeof it.src === 'string' && it.src.indexOf('data:image/') === 0;
+    }
+    return false;
+  }
+
+  function cleanItem(it) {
+    if (!validItem(it)) return null;
+    if (it.type === 'text') {
+      if (!it.font || !FONT_OK[it.font]) it.font = '';
+      if (typeof it.bold !== 'boolean') delete it.bold;
+    } else if (it.type === 'img') {
+      it.bw = isNum(it.bw) ? Math.max(0, Math.min(60, Math.round(it.bw * 10) / 10)) : 0;
+      if (!isHexColor(it.bc)) it.bc = '#000000';
+    }
+    return it;
+  }
+
+  function applyRaw(raw2, raw1) {
+    try {
+      var d = null, list = null;
+      if (raw2) {
+        d = JSON.parse(raw2);
+        if (d && Array.isArray(d.cards)) list = d.cards;
+      } else if (raw1) {
+        d = JSON.parse(raw1);
+        list = [{ name: '', bg: d.bg, items: d.items, nextId: d.nextId }];
+      }
+      if (!list || !list.length) return;
+      if (typeof d.grid === 'boolean') $('showGrid').checked = d.grid;
+      if (typeof d.tags === 'boolean') $('showTags').checked = d.tags;
+      var out = [];
+      list.slice(0, 10).forEach(function (c) {
+        var its = [], maxId = 0;
+        ((c && c.items) || []).forEach(function (raw) {
+          var it = cleanItem(raw);
+          if (!it) return;
+          its.push(it);
+          if (it.id > maxId) maxId = it.id;
+        });
+        out.push({
+          name: (c && typeof c.name === 'string') ? c.name.slice(0, 24) : '',
+          bg: (c && isHexColor(c.bg)) ? c.bg : '#ffffff',
+          items: its,
+          nextId: Math.max((c && isNum(c.nextId)) ? c.nextId : 1, maxId + 1)
+        });
+      });
+      cards = out;
+      var k = (isNum(d.cur) && d.cur >= 0 && d.cur < out.length) ? Math.floor(d.cur) : 0;
+      loadCard(k);
+      var total = 0;
+      out.forEach(function (c) { total += c.items.length; });
+      if (total) say('Pehle ka kaam wapas aa gaya.');
+    } catch (e) {}
+  }
+
+  function restore() {
+    var raw2 = null, raw1 = null;
+    try {
+      raw2 = localStorage.getItem('blankcard-v2');
+      raw1 = localStorage.getItem('blankcard-v1');
+    } catch (e) {}
+    if (raw2 || raw1) { applyRaw(raw2, raw1); return; }
+    if (window.indexedDB) {
+      idbGet('state').then(function (raw) {
+        if (raw && items.length === 0 && cards.length === 1) { applyRaw(raw, null); resetHistory(); }
+      }).catch(function () {});
+    }
+  }
+
+  function say(m) { note.textContent = m; }
+  function find(id) { for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i]; return null; }
+
+  function clamp(it) {
+    it.x = Math.round(Math.max(0, Math.min(1016 - 30, it.x)));
+    it.y = Math.round(Math.max(0, Math.min(638 - 20, it.y)));
+  }
+
+  function applyPos(it) {
+    var el = els[it.id];
+    el.style.left = it.x + 'px';
+    el.style.top = it.y + 'px';
+    el.style.transform = 'scale(' + it.s + ')';
+    scheduleSave();
+    if (selected === it.id) syncCtl();
+  }
+
+  function cropImg(it, el) {
+    el = el || els[it.id];
+    var im = el.firstChild;
+    var h = it.w * it.nh / it.nw;
+    el.style.width = Math.max(10, it.w * (1 - it.cl - it.cr)) + 'px';
+    el.style.height = Math.max(10, h * (1 - it.ct - it.cb)) + 'px';
+    el.style.overflow = 'hidden';
+    im.style.position = 'absolute';
+    im.style.width = it.w + 'px';
+    im.style.height = h + 'px';
+    im.style.left = (-it.cl * it.w) + 'px';
+    im.style.top = (-it.ct * h) + 'px';
+    scheduleSave();
+    if (selected === it.id) syncCtl();
+  }
+
+  function makeEl(it) {
+    var el = document.createElement('div');
+    el.className = 'item ' + it.type;
+    el.setAttribute('data-id', String(it.id));
+    if (it.type === 'text') {
+      el.textContent = it.text;
+      applyText(it, el);
+    } else {
+      var im = document.createElement('img');
+      im.src = it.src; im.alt = '';
+      el.appendChild(im);
+      cropImg(it, el);
+      applyBorder(it, el);
+    }
+    card.appendChild(el);
+    els[it.id] = el;
+    applyPos(it);
+  }
+
+  function select(id) {
+    if (selected !== null && els[selected]) els[selected].classList.remove('sel');
+    selected = id;
+    var it = id === null ? null : find(id);
+    var on = !!it;
+    if (on) els[id].classList.add('sel');
+    $('selName').textContent = !on ? 'Abhi kuch chuna nahi hai' : ('Chuna hua: ' + itemLabel(it));
+    ['nL', 'nU', 'nD', 'nR', 'sMinus', 'sPlus', 'del', 'sizeRange', 'sizeNum', 'posX', 'posY'].forEach(function (b) { $(b).disabled = !on; });
+    if (on) { syncCtl(); } else { ['sizeNum', 'posX', 'posY'].forEach(function (id) { $(id).value = ''; }); $('infoLine').textContent = ''; }
+    $('textBox').hidden = !(on && it.type === 'text');
+    $('colorBox').hidden = !(on && it.type === 'text');
+    $('fontBox').hidden = !(on && it.type === 'text');
+    $('cropBox').hidden = !(on && it.type === 'img');
+    $('borderBox').hidden = !(on && it.type === 'img');
+    if (on && it.type === 'img') {
+      $('cropT').value = Math.round(it.ct * 100);
+      $('cropB').value = Math.round(it.cb * 100);
+      $('cropL').value = Math.round(it.cl * 100);
+      $('cropR').value = Math.round(it.cr * 100);
+    }
+    if (on && it.type === 'text') {
+      $('selText').value = it.text;
+      $('selColor').value = it.color;
+      $('selHex').value = it.color.toUpperCase();
+      $('selFont').value = (it.font && FONT_OK[it.font]) ? it.font : '';
+      $('selBold').checked = !!it.bold;
+    }
+    refreshNums();
+  }
+
+  function addItem(it) {
+    it.id = nextId++;
+    items.push(it);
+    makeEl(it);
+    select(it.id);
+  }
+
+  $('addText').addEventListener('click', function () {
+    var n = items.length % 8;
+    var tx = 60 + n * 24, ty = 60 + n * 40, usedSpot = false;
+    if (lastTextSpot) {
+      tx = lastTextSpot.x; ty = lastTextSpot.y;
+      lastTextSpot = null;
+      saveSpot();
+      usedSpot = true;
+    }
+    var tIt = { type: 'text', text: 'Yahan likho', color: '#111111', font: '', bold: false, x: tx, y: ty, s: 1 };
+    clamp(tIt);
+    addItem(tIt);
+    if (usedSpot) say('Text wahin aayi jahan se hataya tha (X ' + tIt.x + ', Y ' + tIt.y + ').');
+    $('selText').focus();
+    $('selText').select();
+  });
+
+  $('photoPick').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    var input = this;
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      var src = String(fr.result);
+      var im = new Image();
+      im.onload = function () {
+        input.value = '';
+        openCrop(src, im, f.type);
+      };
+      im.onerror = function () { say('Ye file image nahi lag rahi. Dusri photo chuno.'); input.value = ''; };
+      im.src = src;
+    };
+    fr.onerror = function () { say('Photo padh nahi payi. Dobara try karo.'); };
+    fr.readAsDataURL(f);
+  });
+
+  $('bgColor').addEventListener('input', function () { card.style.background = this.value; scheduleSave(); });
+
+  $('selText').addEventListener('input', function () {
+    var it = find(selected);
+    if (!it || it.type !== 'text') return;
+    it.text = this.value;
+    scheduleSave();
+    els[it.id].textContent = this.value || '\u00a0';
+  });
+  $('selColor').addEventListener('input', function () {
+    var it = find(selected);
+    if (!it || it.type !== 'text') return;
+    it.color = this.value;
+    scheduleSave();
+    els[it.id].style.color = this.value;
+  });
+
+  $('selFont').addEventListener('change', function () {
+    var it = find(selected);
+    if (!it || it.type !== 'text') return;
+    it.font = this.value;
+    applyText(it);
+    scheduleSave();
+  });
+  $('selBold').addEventListener('change', function () {
+    var it = find(selected);
+    if (!it || it.type !== 'text') return;
+    it.bold = this.checked;
+    applyText(it);
+    scheduleSave();
+  });
+
+  function move(dx, dy) {
+    var it = find(selected);
+    if (!it) return;
+    it.x += dx; it.y += dy; clamp(it); applyPos(it);
+  }
+  var gridLayer = document.createElement('div');
+  gridLayer.id = 'gridLayer';
+  (function () {
+    var i, s;
+    for (i = 0; i <= 1000; i += 100) {
+      s = document.createElement('span'); s.className = 'gl'; s.textContent = i;
+      s.style.left = (i + 3) + 'px'; s.style.top = '2px';
+      gridLayer.appendChild(s);
+    }
+    for (i = 100; i <= 600; i += 100) {
+      s = document.createElement('span'); s.className = 'gl'; s.textContent = i;
+      s.style.left = '3px'; s.style.top = (i + 2) + 'px';
+      gridLayer.appendChild(s);
+    }
+  })();
+  var tagLayer = document.createElement('div');
+  tagLayer.id = 'tagLayer';
+  card.appendChild(gridLayer);
+  card.appendChild(tagLayer);
+  var showNums = $('showTags');
+  var showGrid = $('showGrid');
+
+  function itemBox(it) {
+    var el = els[it.id];
+    if (it.type === 'img') {
+      var ih = it.w * it.nh / it.nw;
+      return { w: it.w * (1 - it.cl - it.cr) * it.s, h: ih * (1 - it.ct - it.cb) * it.s };
+    }
+    return { w: el.offsetWidth * it.s, h: el.offsetHeight * it.s };
+  }
+
+  function typeNo(it) {
+    var n = 0;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type === it.type) n++;
+      if (items[i] === it) break;
+    }
+    return n;
+  }
+  function itemLabel(it) { return (it.type === 'img' ? 'Photo ' : 'Text ') + typeNo(it); }
+
+  function refreshNums() {
+    var sIt = find(selected);
+    if (sIt) $('selName').textContent = 'Chuna hua: ' + itemLabel(sIt);
+    gridLayer.style.display = showGrid.checked ? 'block' : 'none';
+    tagLayer.style.display = showNums.checked ? 'block' : 'none';
+    tagLayer.innerHTML = '';
+    items.forEach(function (it, i) {
+      var t = document.createElement('div');
+      t.className = 'tag ' + it.type + (it.id === selected ? ' sel' : '');
+      t.style.left = it.x + 'px';
+      t.style.top = it.y + 'px';
+      var code = (it.type === 'img' ? 'P' : 'T') + typeNo(it);
+      t.textContent = (it.id === selected) ? (code + ' · X' + it.x + ' Y' + it.y) : code;
+      tagLayer.appendChild(t);
+    });
+    var list = $('itemList');
+    list.innerHTML = '';
+    if (!items.length) {
+      var p = document.createElement('div');
+      p.className = 'hint';
+      p.textContent = 'Abhi koi cheez nahi hai. Photo ya text jodo.';
+      list.appendChild(p);
+    }
+    items.forEach(function (it, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'lrow' + (it.id === selected ? ' on' : '');
+      var label = itemLabel(it) + (it.type === 'img' ? '' : ': ' + String(it.text || '').replace(/\s+/g, ' ').slice(0, 18));
+      b.textContent = label + '   |   X ' + it.x + '  Y ' + it.y + '   |   ' + Math.round(it.s * 100) + '%';
+      b.addEventListener('click', function () { select(it.id); });
+      list.appendChild(b);
+    });
+    $('locFromSel').disabled = selected === null;
+  }
+  showNums.addEventListener('change', function () { refreshNums(); scheduleSave(); });
+  showGrid.addEventListener('change', function () { refreshNums(); scheduleSave(); });
+
+  var locs = [];
+  var locMode = 'tl';
+  var nextLoc = 1;
+  function loadLocs() {
+    try {
+      var o = JSON.parse(localStorage.getItem('blankcard-locs') || 'null');
+      if (o && Array.isArray(o.list)) {
+        locs = o.list.filter(function (l) { return l && isNum(l.n) && isNum(l.x) && isNum(l.y); }).slice(0, 30);
+        nextLoc = Math.max(isNum(o.next) ? o.next : 1, locs.reduce(function (m, l) { return Math.max(m, l.n); }, 0) + 1);
+        if (o.mode === 'c' || o.mode === 'tl') locMode = o.mode;
+      }
+    } catch (e) {}
+  }
+  function saveLocs() {
+    try { localStorage.setItem('blankcard-locs', JSON.stringify({ list: locs, next: nextLoc, mode: locMode })); } catch (e) {}
+  }
+  function clampLoc(v, max) { return Math.round(Math.max(0, Math.min(max, v))); }
+
+  function snapTo(l) {
+    var it = find(selected);
+    if (!it) { say('Pehle card par koi cheez dabao (chuno), phir jagah par lagao.'); return; }
+    var b = itemBox(it);
+    if (locMode === 'c') { it.x = l.x - b.w / 2; it.y = l.y - b.h / 2; }
+    else { it.x = l.x; it.y = l.y; }
+    clamp(it);
+    applyPos(it);
+    say(itemLabel(it) + ' ko L' + l.n + ' par laga diya (X ' + it.x + ', Y ' + it.y + ').');
+  }
+
+  function numBox(v, max, label) {
+    var i = document.createElement('input');
+    i.type = 'number'; i.min = 0; i.max = max; i.step = 1; i.value = v;
+    i.setAttribute('aria-label', label);
+    return i;
+  }
+
+  function renderLocs() {
+    var box = $('locList');
+    box.innerHTML = '';
+    if (!locs.length) {
+      var p = document.createElement('div');
+      p.className = 'hint';
+      p.textContent = 'Abhi koi jagah save nahi hai.';
+      box.appendChild(p);
+    }
+    locs.forEach(function (l) {
+      var row = document.createElement('div');
+      row.className = 'loc-row';
+      var tag = document.createElement('b');
+      tag.textContent = 'L' + l.n;
+      var ix = numBox(l.x, 1016, 'L' + l.n + ' X');
+      var iy = numBox(l.y, 638, 'L' + l.n + ' Y');
+      ix.addEventListener('change', function () {
+        var v = Number(ix.value);
+        if (isFinite(v) && ix.value !== '') l.x = clampLoc(v, 1016);
+        ix.value = l.x; saveLocs();
+      });
+      iy.addEventListener('change', function () {
+        var v = Number(iy.value);
+        if (isFinite(v) && iy.value !== '') l.y = clampLoc(v, 638);
+        iy.value = l.y; saveLocs();
+      });
+      var go = document.createElement('button');
+      go.type = 'button'; go.className = 'mini'; go.textContent = 'Yahan lagao';
+      go.addEventListener('click', function () { snapTo(l); });
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'mini'; del.textContent = '×';
+      del.setAttribute('aria-label', 'L' + l.n + ' hatao');
+      del.addEventListener('click', function () {
+        locs = locs.filter(function (x) { return x !== l; });
+        saveLocs(); renderLocs();
+      });
+      row.appendChild(tag); row.appendChild(ix); row.appendChild(iy); row.appendChild(go); row.appendChild(del);
+      box.appendChild(row);
+    });
+  }
+
+  function addLoc(x, y) {
+    if (locs.length >= 30) { say('30 se zyada jagah save nahi ho sakti. Kuch hata do.'); return; }
+    var l = { n: nextLoc++, x: clampLoc(x, 1016), y: clampLoc(y, 638) };
+    locs.push(l);
+    saveLocs(); renderLocs();
+    say('Jagah L' + l.n + ' save ho gayi (X ' + l.x + ', Y ' + l.y + ').');
+  }
+
+  $('locFromSel').addEventListener('click', function () {
+    var it = find(selected);
+    if (!it) return;
+    var b = itemBox(it);
+    if (locMode === 'c') addLoc(it.x + b.w / 2, it.y + b.h / 2);
+    else addLoc(it.x, it.y);
+  });
+  $('locAdd').addEventListener('click', function () {
+    var x = Number($('newLocX').value), y = Number($('newLocY').value);
+    if (!isFinite(x) || !isFinite(y) || $('newLocX').value === '' || $('newLocY').value === '') { say('X aur Y dono number likho.'); return; }
+    addLoc(x, y);
+  });
+  $('anchorSel').addEventListener('change', function () { locMode = this.value; saveLocs(); });
+
+  // ---------- multiple cards ----------
+  var cards = [{ name: '', bg: '#ffffff', items: items, nextId: 1 }];
+  var curCard = 0;
+
+  function cname(k) {
+    var n = (cards[k].name || '').trim();
+    return n || ('Card ' + (k + 1));
+  }
+
+  function commitCur() {
+    var c = cards[curCard];
+    if (!c) return;
+    c.items = items;
+    c.nextId = nextId;
+    c.bg = $('bgColor').value || '#ffffff';
+  }
+
+  function renderCardTabs() {
+    var box = $('cardTabs');
+    box.innerHTML = '';
+    cards.forEach(function (c, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tab' + (i === curCard ? ' on' : '');
+      b.textContent = cname(i);
+      b.setAttribute('aria-pressed', i === curCard ? 'true' : 'false');
+      b.addEventListener('click', function () { if (i !== curCard) switchTo(i); });
+      box.appendChild(b);
+    });
+    var nm = $('cardName');
+    if (document.activeElement !== nm) nm.value = cards[curCard].name || '';
+    nm.placeholder = 'Card ' + (curCard + 1);
+    $('cardTitle').textContent = 'Card (preview): ' + cname(curCard);
+    $('cardDel').disabled = cards.length < 2;
+    render3dSelects();
+    schedule3d();
+  }
+
+  function loadCard(k) {
+    if (selected !== null) select(null);
+    drag = null; pinch = null; pointers = {};
+    items.forEach(function (it) {
+      if (els[it.id] && els[it.id].parentNode === card) card.removeChild(els[it.id]);
+    });
+    els = {};
+    curCard = k;
+    var c = cards[k];
+    items = c.items;
+    nextId = c.nextId;
+    $('bgColor').value = c.bg;
+    $('bgHex').value = c.bg.toUpperCase();
+    card.style.background = c.bg;
+    items.forEach(function (it) { makeEl(it); });
+    renderCardTabs();
+    refreshNums();
+    follow3d();
+  }
+
+  function switchTo(k) {
+    commitCur();
+    loadCard(k);
+    scheduleSave();
+  }
+
+  $('cardName').addEventListener('input', function () {
+    cards[curCard].name = this.value.slice(0, 24);
+    renderCardTabs();
+    scheduleSave();
+  });
+
+  $('cardNew').addEventListener('click', function () {
+    if (cards.length >= 10) { say('10 se zyada card nahi ho sakte.'); return; }
+    commitCur();
+    cards.push({ name: '', bg: '#ffffff', items: [], nextId: 1 });
+    loadCard(cards.length - 1);
+    scheduleSave();
+    say(cname(curCard) + ' bana diya (khali). Ab isi par kaam karo.');
+  });
+
+  $('cardCopy').addEventListener('click', function () {
+    if (cards.length >= 10) { say('10 se zyada card nahi ho sakte.'); return; }
+    commitCur();
+    var src = cards[curCard];
+    cards.push({
+      name: (cname(curCard) + ' copy').slice(0, 24),
+      bg: src.bg,
+      items: JSON.parse(JSON.stringify(src.items)),
+      nextId: src.nextId
+    });
+    loadCard(cards.length - 1);
+    scheduleSave();
+    say(cname(curCard) + ' bana diya (copy). Ab isi par kaam karo.');
+  });
+
+  var delArm = null;
+  $('cardDel').addEventListener('click', function () {
+    if (cards.length < 2) { say('Kam se kam ek card rehna zaruri hai.'); return; }
+    var b = this;
+    if (!delArm) {
+      b.textContent = 'Pakka hatao? Dobara dabao';
+      delArm = setTimeout(function () { delArm = null; b.textContent = 'Card hatao'; }, 3500);
+      return;
+    }
+    clearTimeout(delArm);
+    delArm = null;
+    b.textContent = 'Card hatao';
+    var name = cname(curCard);
+    cards.splice(curCard, 1);
+    loadCard(Math.min(curCard, cards.length - 1));
+    scheduleSave();
+    say(name + ' hata diya.');
+  });
+
+  // ---------- choose which card to download / print ----------
+  var pk = null;
+  function openPick(mode) {
+    pk = { mode: mode };
+    commitCur();
+    $('pkTitle').textContent = mode === 'dl' ? 'Kaun sa card download karna hai?' : (mode === 'pdf' ? 'Kaun sa card PDF mein chahiye?' : 'Kaun sa card print karna hai?');
+    $('pkOk').textContent = mode === 'dl' ? 'Download karo' : (mode === 'pdf' ? 'PDF banao' : 'Print karo');
+    var box = $('pkList');
+    box.innerHTML = '';
+    cards.forEach(function (c, i) {
+      var lab = document.createElement('label');
+      lab.className = 'chk';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.value = String(i); cb.checked = (i === curCard);
+      var sp = document.createElement('span');
+      sp.textContent = cname(i) + '  (' + c.items.length + ' cheez)';
+      lab.appendChild(cb); lab.appendChild(sp);
+      box.appendChild(lab);
+    });
+    $('pickModal').hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closePick() {
+    $('pickModal').hidden = true;
+    document.body.style.overflow = '';
+    pk = null;
+  }
+  $('pkCancel').addEventListener('click', closePick);
+  $('pkAll').addEventListener('click', function () {
+    var cbs = $('pkList').querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < cbs.length; i++) cbs[i].checked = true;
+  });
+  $('pkOk').addEventListener('click', function () {
+    if (!pk) return;
+    var mode = pk.mode;
+    var idxs = [];
+    var cbs = $('pkList').querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < cbs.length; i++) if (cbs[i].checked) idxs.push(Number(cbs[i].value));
+    if (!idxs.length) { say('Kam se kam ek card chuno.'); return; }
+    closePick();
+    if (mode === 'dl') downloadCards(idxs); else if (mode === 'pdf') makePdf(idxs); else printCards(idxs);
+  });
+
+  function safeName(k) {
+    return cname(k).replace(/[^\w\u0900-\u097F]+/g, '-').replace(/^-+|-+$/g, '') || ('card-' + (k + 1));
+  }
+
+  function saveCanvas(canvas, name) {
+    return new Promise(function (resolve, reject) {
+      canvas.toBlob(function (blob) {
+        if (!blob) { reject(new Error('blob')); return; }
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = name + '.png';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); resolve(); }, 700);
+      }, 'image/png');
+    });
+  }
+
+  // ---------- draw a card straight onto a canvas (same look as the preview) ----------
+  var DEFAULT_STACK = '"Noto Sans Devanagari", "Nirmala UI", Mangal, "Segoe UI", system-ui, Arial, sans-serif';
+
+  function textWeight(it) {
+    return (typeof it.bold === 'boolean') ? (it.bold ? 700 : 400) : 600;
+  }
+  function textFamily(it) {
+    return (it.font && FONT_OK[it.font])
+      ? '"' + it.font + '", "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif'
+      : DEFAULT_STACK;
+  }
+
+  function drawItem(ctx, it, imgs) {
+    ctx.save();
+    ctx.translate(it.x, it.y);
+    ctx.scale(it.s, it.s);
+    if (it.type === 'img') {
+      var im = imgs[it.id];
+      if (im) {
+        var ih = it.w * it.nh / it.nw;
+        var bw = it.w * (1 - it.cl - it.cr);
+        var bh = ih * (1 - it.ct - it.cb);
+        var b = it.bw || 0;
+        if (b > 0) {
+          ctx.fillStyle = it.bc || '#000000';
+          ctx.beginPath();
+          ctx.rect(-b, -b, bw + 2 * b, bh + 2 * b);
+          ctx.rect(0, 0, bw, bh);
+          ctx.fill('evenodd');
+        }
+        ctx.beginPath();
+        ctx.rect(0, 0, bw, bh);
+        ctx.clip();
+        ctx.drawImage(im, -it.cl * it.w, -it.ct * ih, it.w, ih);
+      }
+    } else {
+      ctx.font = textWeight(it) + ' 40px ' + textFamily(it);
+      ctx.fillStyle = it.color;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+      var m = ctx.measureText('Hg');
+      var asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
+      if (!isFinite(asc) || !isFinite(desc)) { asc = 36; desc = 10; }
+      String(it.text).split('\n').forEach(function (ln, i) {
+        var lineTop = 2 + i * 50;
+        var baseline = lineTop + (50 - (asc + desc)) / 2 + asc;
+        ctx.fillText(ln, 4, baseline);
+      });
+    }
+    ctx.restore();
+  }
+
+  function renderCardCanvas(c) {
+    var imgs = {};
+    var jobs = [];
+    var failed = 0;
+    c.items.forEach(function (it) {
+      if (it.type === 'img') {
+        jobs.push(new Promise(function (resolve) {
+          var im = new Image();
+          im.onload = function () { imgs[it.id] = im; resolve(); };
+          im.onerror = function () { failed++; resolve(); };
+          im.src = it.src;
+        }));
+      } else if (document.fonts && document.fonts.load) {
+        var fam = (it.font && FONT_OK[it.font]) ? it.font : 'Noto Sans Devanagari';
+        jobs.push(document.fonts.load(textWeight(it) + ' 40px "' + fam + '"', it.text || 'A').catch(function () {}));
+      }
+    });
+    return Promise.all(jobs).then(function () {
+      return (document.fonts && document.fonts.ready) ? document.fonts.ready : null;
+    }).then(function () {
+      var cv = document.createElement('canvas');
+      cv.width = 1016; cv.height = 638;
+      var ctx = cv.getContext('2d');
+      ctx.fillStyle = c.bg || '#ffffff';
+      ctx.fillRect(0, 0, 1016, 638);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      c.items.forEach(function (it) { drawItem(ctx, it, imgs); });
+      cv.failedImgs = failed;
+      return cv;
+    });
+  }
+
+  function downloadCards(idxs) {
+    select(null);
+    commitCur();
+    var chain = Promise.resolve();
+    var report = [];
+    idxs.forEach(function (k, n) {
+      chain = chain.then(function () {
+        say('Image ban rahi hai... (' + (n + 1) + '/' + idxs.length + ')');
+        return renderCardCanvas(cards[k]).then(function (cv) {
+          var p = 0, t = 0;
+          cards[k].items.forEach(function (it) { if (it.type === 'img') p++; else t++; });
+          report.push(cname(k) + ': ' + p + ' photo, ' + t + ' text' + (cv.failedImgs ? ' (' + cv.failedImgs + ' photo load nahi hui!)' : ''));
+          return saveCanvas(cv, safeName(k));
+        });
+      });
+    });
+    chain.then(function () {
+      say('Image save ho gayi (1016 × 638), isme aaya: ' + report.join('  |  ') + (idxs.length > 1 ? '. Sab download na hon to browser mein "multiple downloads" allow karo.' : ''));
+    }, function () {
+      say('Image nahi ban payi. Dobara try karo.');
+    });
+  }
+
+  function printCards(idxs) {
+    select(null);
+    commitCur();
+    say('Print ke liye taiyaar ho raha hai...');
+    var area = $('printArea');
+    area.innerHTML = '';
+    var chain = Promise.resolve();
+    idxs.forEach(function (k) {
+      chain = chain.then(function () {
+        return renderCardCanvas(cards[k]).then(function (cv) {
+          return new Promise(function (resolve) {
+            var im = new Image();
+            im.className = 'pimg';
+            im.alt = '';
+            im.onload = resolve;
+            im.onerror = resolve;
+            im.src = cv.toDataURL('image/png');
+            area.appendChild(im);
+          });
+        });
+      });
+    });
+    chain.then(function () {
+      say('');
+      document.body.classList.add('printing');
+      window.print();
+    }, function () {
+      say('Print ke liye card nahi ban paya. Dobara try karo.');
+    });
+  }
+  // ---------- backup / restore file ----------
+  function stampDate() {
+    var d = new Date();
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes());
+  }
+
+  $('bkSave').addEventListener('click', function () {
+    select(null);
+    commitCur();
+    var data = {
+      app: 'blankcard', v: 1,
+      cards: cards, cur: curCard,
+      grid: $('showGrid').checked, tags: $('showTags').checked,
+      locs: { list: locs, next: nextLoc, mode: locMode },
+      colors: savedColors,
+      pick3d: { f: f3, b: b3, a: b3auto }
+    };
+    var blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    saveBlob(blob, 'card-backup-' + stampDate() + '.json');
+    say('Backup file save ho gayi (' + cards.length + ' card). Isey sambhal kar rakhna.');
+  });
+
+  $('bkFile').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    var input = this;
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      input.value = '';
+      var d;
+      try { d = JSON.parse(String(fr.result)); } catch (e) { say('Ye backup file sahi nahi lag rahi.'); return; }
+      if (!d || d.app !== 'blankcard' || !Array.isArray(d.cards) || !d.cards.length) {
+        say('Ye is app ki backup file nahi hai.');
+        return;
+      }
+      flushHist();
+      select(null);
+      applyRaw(JSON.stringify({ cards: d.cards, cur: d.cur, grid: d.grid, tags: d.tags }), null);
+      if (d.locs && Array.isArray(d.locs.list)) {
+        locs = d.locs.list.filter(function (l) { return l && isNum(l.n) && isNum(l.x) && isNum(l.y); }).slice(0, 30);
+        nextLoc = Math.max(isNum(d.locs.next) ? d.locs.next : 1, locs.reduce(function (m, l) { return Math.max(m, l.n); }, 0) + 1);
+        if (d.locs.mode === 'c' || d.locs.mode === 'tl') locMode = d.locs.mode;
+        saveLocs();
+        $('anchorSel').value = locMode;
+        renderLocs();
+      }
+      if (Array.isArray(d.colors)) {
+        savedColors = d.colors.filter(isHexColor).slice(-12);
+        persistColors();
+        colorWidgets.forEach(function (w) { w.renderSw(); });
+      }
+      if (d.pick3d && isNum(d.pick3d.f) && isNum(d.pick3d.b)) {
+        f3 = d.pick3d.f; b3 = d.pick3d.b; b3auto = d.pick3d.a !== false;
+        save3dPick();
+      }
+      render3dSelects();
+      refresh3d();
+      var n = 0;
+      cards.forEach(function (c) { n += c.items.length; });
+      scheduleSave();
+      say('Backup se wapas aa gaya: ' + cards.length + ' card, ' + n + ' cheez. Galti ho to Undo dabao.');
+    };
+    fr.onerror = function () { say('File padh nahi payi. Dobara try karo.'); };
+    fr.readAsText(f);
+  });
+
+  // ---------- Undo / Redo ----------
+  var hist = [], hpos = -1, histTimer = null, histBusy = false, lastSig = '';
+
+  function cloneCards(list) {
+    return list.map(function (c) {
+      return {
+        name: c.name, bg: c.bg, nextId: c.nextId,
+        items: c.items.map(function (it) { return Object.assign({}, it); })
+      };
+    });
+  }
+  function snapNow() {
+    commitCur();
+    return { cur: curCard, cards: cloneCards(cards) };
+  }
+  function sigOf(snap) {
+    return JSON.stringify([snap.cur, snap.cards.map(function (c) {
+      return [c.name, c.bg, c.nextId, c.items.map(function (it) {
+        var o = Object.assign({}, it);
+        if (typeof o.src === 'string') o.src = o.src.length + ':' + o.src.slice(-24);
+        return o;
+      })];
+    })]);
+  }
+  function updateHistBtns() {
+    var canU = hpos > 0, canR = hpos < hist.length - 1;
+    var us = document.querySelectorAll('.undoBtn'), rs = document.querySelectorAll('.redoBtn'), i;
+    for (i = 0; i < us.length; i++) {
+      us[i].disabled = !canU;
+      us[i].textContent = '\u21B6 Undo' + (canU ? ' (' + hpos + ')' : '');
+    }
+    for (i = 0; i < rs.length; i++) {
+      rs[i].disabled = !canR;
+      rs[i].textContent = '\u21B7 Redo' + (canR ? ' (' + (hist.length - 1 - hpos) + ')' : '');
+    }
+  }
+  function pushHistory() {
+    histTimer = null;
+    if (histBusy) return;
+    var snap = snapNow();
+    var sig = sigOf(snap);
+    if (sig === lastSig) return;
+    hist = hist.slice(0, hpos + 1);
+    hist.push({ snap: snap });
+    if (hist.length > 50) hist.shift();
+    hpos = hist.length - 1;
+    lastSig = sig;
+    updateHistBtns();
+  }
+  function scheduleHist() {
+    if (histBusy) return;
+    clearTimeout(histTimer);
+    histTimer = setTimeout(pushHistory, 450);
+  }
+  function resetHistory() {
+    clearTimeout(histTimer);
+    histTimer = null;
+    hist = []; hpos = -1; lastSig = '';
+    pushHistory();
+  }
+  function flushHist() {
+    if (histTimer) { clearTimeout(histTimer); pushHistory(); }
+  }
+  function gotoHist(pos) {
+    if (pos < 0 || pos >= hist.length) return;
+    hpos = pos;
+    var h = hist[pos];
+    histBusy = true;
+    clearTimeout(histTimer);
+    histTimer = null;
+    try {
+      select(null);
+      cards = cloneCards(h.snap.cards);
+      loadCard(Math.min(h.snap.cur, cards.length - 1));
+    } finally {
+      histBusy = false;
+    }
+    lastSig = sigOf(snapNow());
+    updateHistBtns();
+    scheduleSave();
+  }
+  function undo() {
+    flushHist();
+    if (hpos > 0) { gotoHist(hpos - 1); say('Undo ho gaya.'); }
+    else say('Aur peeche kuch nahi hai.');
+  }
+  function redo() {
+    flushHist();
+    if (hpos < hist.length - 1) { gotoHist(hpos + 1); say('Redo ho gaya.'); }
+    else say('Aage kuch nahi hai.');
+  }
+  (function () {
+    var us = document.querySelectorAll('.undoBtn'), rs = document.querySelectorAll('.redoBtn'), i;
+    for (i = 0; i < us.length; i++) us[i].addEventListener('click', undo);
+    for (i = 0; i < rs.length; i++) rs[i].addEventListener('click', redo);
+  })();
+  document.addEventListener('keydown', function (e) {
+    var t = e.target, tag = (t && t.tagName) ? t.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    if (!(e.ctrlKey || e.metaKey)) return;
+    var k = String(e.key).toLowerCase();
+    if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+    else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); redo(); }
+  });
+
+  // ---------- 3D card: front card + back card ----------
+  var f3 = 0, b3 = -1, b3auto = true;
+  var r3x = 10, r3y = -20, drag3 = null, sc3 = 1, t3Timer = null;
+  var P3 = 2600, T3 = 9;
+
+  function save3dPick() {
+    try { localStorage.setItem('blankcard-3d', JSON.stringify({ f: f3, b: b3, a: b3auto })); } catch (e) {}
+  }
+  function load3dPick() {
+    try {
+      var o = JSON.parse(localStorage.getItem('blankcard-3d') || 'null');
+      if (o && isNum(o.f) && isNum(o.b)) { f3 = o.f; b3 = o.b; b3auto = o.a !== false; }
+    } catch (e) {}
+  }
+  function fix3d() {
+    var n = cards.length;
+    if (f3 < 0 || f3 >= n) f3 = 0;
+    if (b3auto) b3 = n > 1 ? (f3 === 0 ? 1 : 0) : -1;
+    if (b3 >= n || b3 < -1) b3 = -1;
+  }
+
+  function render3dSelects() {
+    fix3d();
+    var sf = $('sel3dFront'), sb = $('sel3dBack');
+    if (!sf || !sb) return;
+    sf.innerHTML = '';
+    sb.innerHTML = '';
+    cards.forEach(function (c, i) {
+      var o = document.createElement('option');
+      o.value = String(i); o.textContent = cname(i);
+      sf.appendChild(o);
+      sb.appendChild(o.cloneNode(true));
+    });
+    var none = document.createElement('option');
+    none.value = '-1'; none.textContent = '(peeche kuch nahi)';
+    sb.appendChild(none);
+    sf.value = String(f3);
+    sb.value = String(b3);
+  }
+
+  function blankBack() {
+    var cv = document.createElement('canvas');
+    cv.width = 1016; cv.height = 638;
+    var c = cv.getContext('2d');
+    c.fillStyle = '#eef1f7';
+    c.fillRect(0, 0, 1016, 638);
+    c.fillStyle = '#8a93a6';
+    c.font = '600 40px "Noto Sans Devanagari", system-ui, sans-serif';
+    c.textAlign = 'center';
+    c.fillText('Peeche kuch nahi', 508, 330);
+    return cv;
+  }
+  function faceCanvas(idx) {
+    return idx >= 0 ? renderCardCanvas(cards[idx]) : Promise.resolve(blankBack());
+  }
+  function refresh3d() {
+    commitCur();
+    fix3d();
+    Promise.all([faceCanvas(f3), faceCanvas(b3)]).then(function (r) {
+      $('f3d').src = r[0].toDataURL('image/png');
+      $('b3d').src = r[1].toDataURL('image/png');
+    }).catch(function () {});
+  }
+  function schedule3d() {
+    clearTimeout(t3Timer);
+    t3Timer = setTimeout(refresh3d, 300);
+  }
+
+  function apply3d(animate) {
+    var c = $('card3d');
+    c.style.transition = animate ? 'transform .6s ease' : 'none';
+    c.style.transform = 'rotateX(' + r3x + 'deg) rotateY(' + r3y + 'deg)';
+  }
+  function fit3d() {
+    var st = $('stage3d');
+    sc3 = Math.min(1, st.clientWidth / 1016);
+    $('scaler3d').style.transform = 'scale(' + sc3 + ')';
+    st.style.height = (638 * sc3 + 30) + 'px';
+  }
+  function follow3d() {
+    fix3d();
+    var target = null;
+    if (curCard === b3 && curCard !== f3) target = Math.round((r3y - 180) / 360) * 360 + 180;
+    else if (curCard === f3) target = Math.round(r3y / 360) * 360;
+    if (target !== null && target !== r3y) { r3y = target; apply3d(true); }
+  }
+
+  (function () {
+    var c = $('card3d'), front = $('f3d');
+    for (var z = -7; z <= 7; z += 2) {
+      var d = document.createElement('div');
+      d.className = 'layer3';
+      d.style.transform = 'translateZ(' + z + 'px)';
+      c.insertBefore(d, front);
+    }
+  })();
+
+  var s3 = $('stage3d');
+  s3.addEventListener('pointerdown', function (e) {
+    drag3 = { sx: e.clientX, sy: e.clientY, ox: r3x, oy: r3y };
+    try { s3.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+  s3.addEventListener('pointermove', function (e) {
+    if (!drag3) return;
+    r3y = drag3.oy + (e.clientX - drag3.sx) * 0.5;
+    r3x = Math.max(-60, Math.min(60, drag3.ox - (e.clientY - drag3.sy) * 0.5));
+    apply3d(false);
+  });
+  function end3d() { drag3 = null; }
+  s3.addEventListener('pointerup', end3d);
+  s3.addEventListener('pointercancel', end3d);
+  window.addEventListener('resize', fit3d);
+
+  $('b3Flip').addEventListener('click', function () {
+    r3y = (Math.round(r3y / 180) + 1) * 180;
+    apply3d(true);
+  });
+  $('b3Reset').addEventListener('click', function () {
+    r3y = Math.round(r3y / 360) * 360;
+    r3x = 0;
+    apply3d(true);
+  });
+  $('sel3dFront').addEventListener('change', function () {
+    f3 = Number(this.value);
+    save3dPick();
+    render3dSelects();
+    refresh3d();
+  });
+  $('sel3dBack').addEventListener('change', function () {
+    b3 = Number(this.value);
+    b3auto = false;
+    save3dPick();
+    refresh3d();
+  });
+
+  // ----- draw the 3D card pose into a picture (same angle as on screen) -----
+  function rot3(v, rx, ry) {
+    var ax = rx * Math.PI / 180, ay = ry * Math.PI / 180;
+    var cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+    var x1 = v[0] * cy + v[2] * sy;
+    var y1 = v[1];
+    var z1 = -v[0] * sy + v[2] * cy;
+    return [x1, y1 * cx - z1 * sx, y1 * sx + z1 * cx];
+  }
+  function det3(m) {
+    return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+           m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+           m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+  }
+  function solve3(m, r) {
+    var d = det3(m);
+    var out = [];
+    for (var col = 0; col < 3; col++) {
+      var mm = m.map(function (row, i) { var rr = row.slice(); rr[col] = r[i]; return rr; });
+      out.push(det3(mm) / d);
+    }
+    return out;
+  }
+
+  function drawTri(ctx, img, s0, s1, s2, t0, t1, t2) {
+    var M = [[t0.x, t0.y, 1], [t1.x, t1.y, 1], [t2.x, t2.y, 1]];
+    if (!det3(M)) return;
+    var X = solve3(M, [s0.x, s1.x, s2.x]);
+    var Y = solve3(M, [s0.y, s1.y, s2.y]);
+    var cx = (s0.x + s1.x + s2.x) / 3, cy = (s0.y + s1.y + s2.y) / 3;
+    function grow(p) {
+      var dx = p.x - cx, dy = p.y - cy, l = Math.sqrt(dx * dx + dy * dy) || 1;
+      return { x: p.x + dx / l * 0.7, y: p.y + dy / l * 0.7 };
+    }
+    var e0 = grow(s0), e1 = grow(s1), e2 = grow(s2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(e0.x, e0.y); ctx.lineTo(e1.x, e1.y); ctx.lineTo(e2.x, e2.y);
+    ctx.closePath();
+    ctx.clip();
+    ctx.transform(X[0], Y[0], X[1], Y[1], X[2], Y[2]);
+    var bx = Math.max(0, Math.floor(Math.min(t0.x, t1.x, t2.x)) - 2);
+    var by = Math.max(0, Math.floor(Math.min(t0.y, t1.y, t2.y)) - 2);
+    var bx2 = Math.min(1016, Math.ceil(Math.max(t0.x, t1.x, t2.x)) + 2);
+    var by2 = Math.min(638, Math.ceil(Math.max(t0.y, t1.y, t2.y)) + 2);
+    ctx.drawImage(img, bx, by, bx2 - bx, by2 - by, bx, by, bx2 - bx, by2 - by);
+    ctx.restore();
+  }
+
+  function drawFace(ctx, img, map) {
+    var N = 28, M = 18, W = 1016, H = 638, i, j;
+    var pts = [];
+    for (j = 0; j <= M; j++) {
+      var row = [];
+      for (i = 0; i <= N; i++) row.push(map(i / N, j / M));
+      pts.push(row);
+    }
+    for (j = 0; j < M; j++) {
+      for (i = 0; i < N; i++) {
+        var t00 = { x: i / N * W, y: j / M * H }, t10 = { x: (i + 1) / N * W, y: j / M * H };
+        var t01 = { x: i / N * W, y: (j + 1) / M * H }, t11 = { x: (i + 1) / N * W, y: (j + 1) / M * H };
+        drawTri(ctx, img, pts[j][i], pts[j][i + 1], pts[j + 1][i], t00, t10, t01);
+        drawTri(ctx, img, pts[j][i + 1], pts[j + 1][i + 1], pts[j + 1][i], t10, t11, t01);
+      }
+    }
+  }
+
+  function render3dPose(fc, bc, rx, ry, bg) {
+    var hw = 508, hh = 319, T = T3;
+    function P(x, y, z) {
+      var r = rot3([x, y, z], rx, ry);
+      var w = 1 - r[2] / P3;
+      return { x: r[0] / w, y: r[1] / w };
+    }
+    var minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+    [-hw, hw].forEach(function (x) {
+      [-hh, hh].forEach(function (y) {
+        [-T, T].forEach(function (z) {
+          var p = P(x, y, z);
+          minx = Math.min(minx, p.x); maxx = Math.max(maxx, p.x);
+          miny = Math.min(miny, p.y); maxy = Math.max(maxy, p.y);
+        });
+      });
+    });
+    var M0 = 40;
+    var W = Math.ceil(maxx - minx + 2 * M0), H = Math.ceil(maxy - miny + 2 * M0);
+    var ox = M0 - minx, oy = M0 - miny;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    if (bg && bg !== 'none') { ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H); }
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    function scr(x, y, z) { var p = P(x, y, z); return { x: p.x + ox, y: p.y + oy }; }
+    function visible(center, normal) {
+      var c = rot3(center, rx, ry), n = rot3(normal, rx, ry);
+      return n[0] * (0 - c[0]) + n[1] * (0 - c[1]) + n[2] * (P3 - c[2]) > 0;
+    }
+    var sides = [
+      { c: [0, -hh, 0], n: [0, -1, 0], col: '#d8dde8', q: [[-hw, -hh, T], [hw, -hh, T], [hw, -hh, -T], [-hw, -hh, -T]] },
+      { c: [0, hh, 0], n: [0, 1, 0], col: '#a9b1c1', q: [[-hw, hh, T], [hw, hh, T], [hw, hh, -T], [-hw, hh, -T]] },
+      { c: [-hw, 0, 0], n: [-1, 0, 0], col: '#bcc3d2', q: [[-hw, -hh, T], [-hw, hh, T], [-hw, hh, -T], [-hw, -hh, -T]] },
+      { c: [hw, 0, 0], n: [1, 0, 0], col: '#b3bbcb', q: [[hw, -hh, T], [hw, hh, T], [hw, hh, -T], [hw, -hh, -T]] }
+    ];
+    sides.forEach(function (sd) {
+      if (!visible(sd.c, sd.n)) return;
+      ctx.beginPath();
+      sd.q.forEach(function (pt, i) {
+        var p = scr(pt[0], pt[1], pt[2]);
+        if (i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = sd.col;
+      ctx.fill();
+    });
+    if (visible([0, 0, T], [0, 0, 1])) {
+      drawFace(ctx, fc, function (u, v) { return scr((u - 0.5) * 1016, (v - 0.5) * 638, T); });
+    }
+    if (visible([0, 0, -T], [0, 0, -1])) {
+      drawFace(ctx, bc, function (u, v) { return scr(-(u - 0.5) * 1016, (v - 0.5) * 638, -T); });
+    }
+    return cv;
+  }
+
+  $('b3Save').addEventListener('click', function () {
+    select(null);
+    commitCur();
+    fix3d();
+    say('3D image ban rahi hai...');
+    Promise.all([faceCanvas(f3), faceCanvas(b3)]).then(function (r) {
+      var cv = render3dPose(r[0], r[1], r3x, r3y, $('bg3d').value);
+      return saveCanvas(cv, '3d-' + safeName(f3));
+    }).then(function () {
+      say('3D image save ho gayi (jaisa abhi dikh raha hai).');
+    }, function () {
+      say('3D image nahi ban payi. Dobara try karo.');
+    });
+  });
+
+  // ---------- PDF whose page is exactly the card ----------
+  function canvasToJpegBytes(cv) {
+    return new Promise(function (resolve, reject) {
+      cv.toBlob(function (blob) {
+        if (!blob) { reject(new Error('jpeg')); return; }
+        if (blob.arrayBuffer) {
+          blob.arrayBuffer().then(function (ab) { resolve(new Uint8Array(ab)); }, reject);
+        } else {
+          var fr = new FileReader();
+          fr.onload = function () { resolve(new Uint8Array(fr.result)); };
+          fr.onerror = reject;
+          fr.readAsArrayBuffer(blob);
+        }
+      }, 'image/jpeg', 0.97);
+    });
+  }
+
+  function buildPdf(pages) {
+    var enc = new TextEncoder();
+    var chunks = [], len = 0, offs = [];
+    function push(x) {
+      var b = (typeof x === 'string') ? enc.encode(x) : x;
+      chunks.push(b);
+      len += b.length;
+    }
+    function startObj(n) { offs[n] = len; push(n + ' 0 obj\n'); }
+    var n = pages.length;
+    var total = 2 + n * 3;
+    push('%PDF-1.4\n');
+    startObj(1);
+    push('<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+    var kids = [];
+    for (var i = 0; i < n; i++) kids.push((3 + i * 3) + ' 0 R');
+    startObj(2);
+    push('<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + n + ' >>\nendobj\n');
+    pages.forEach(function (pg, i) {
+      var pn = 3 + i * 3, cn = pn + 1, im = pn + 2;
+      var pw = pg.pw.toFixed(2), ph = pg.ph.toFixed(2);
+      startObj(pn);
+      push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw + ' ' + ph + '] /Resources << /XObject << /Im0 ' + im + ' 0 R >> >> /Contents ' + cn + ' 0 R >>\nendobj\n');
+      var content = 'q ' + pw + ' 0 0 ' + ph + ' 0 0 cm /Im0 Do Q';
+      startObj(cn);
+      push('<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream\nendobj\n');
+      startObj(im);
+      push('<< /Type /XObject /Subtype /Image /Width ' + pg.w + ' /Height ' + pg.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + pg.jpeg.length + ' >>\nstream\n');
+      push(pg.jpeg);
+      push('\nendstream\nendobj\n');
+    });
+    var xrefPos = len;
+    var x = 'xref\n0 ' + (total + 1) + '\n0000000000 65535 f \n';
+    for (var k = 1; k <= total; k++) {
+      var o = String(offs[k]);
+      while (o.length < 10) o = '0' + o;
+      x += o + ' 00000 n \n';
+    }
+    push(x);
+    push('trailer\n<< /Size ' + (total + 1) + ' /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF\n');
+    return new Blob(chunks, { type: 'application/pdf' });
+  }
+
+  function saveBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+  }
+
+  function makePdf(idxs) {
+    select(null);
+    commitCur();
+    var dpi = Number($('pdfDpi').value) || 300;
+    var pw = 1016 * 72 / dpi, ph = 638 * 72 / dpi;
+    var pages = [];
+    var chain = Promise.resolve();
+    idxs.forEach(function (k, n) {
+      chain = chain.then(function () {
+        say('PDF ban rahi hai... (' + (n + 1) + '/' + idxs.length + ')');
+        return renderCardCanvas(cards[k]).then(canvasToJpegBytes).then(function (bytes) {
+          pages.push({ jpeg: bytes, w: 1016, h: 638, pw: pw, ph: ph });
+        });
+      });
+    });
+    chain.then(function () {
+      var blob = buildPdf(pages);
+      saveBlob(blob, (idxs.length === 1 ? safeName(idxs[0]) : 'cards') + '.pdf');
+      var mm = (1016 / dpi * 25.4).toFixed(0) + ' × ' + (638 / dpi * 25.4).toFixed(0) + ' mm';
+      say('PDF save ho gayi. Har page card ke naap ka hai (' + mm + '), ' + idxs.length + ' page.');
+    }, function () {
+      say('PDF nahi ban payi. Dobara try karo.');
+    });
+  }
+
+  $('btnFinal').addEventListener('click', function () {
+    select(null);
+    commitCur();
+    say('Final card ban raha hai...');
+    renderCardCanvas(cards[curCard]).then(function (cv) {
+      $('finalImg').src = cv.toDataURL('image/png');
+      $('fnTitle').textContent = 'Final: ' + cname(curCard);
+      $('finalModal').hidden = false;
+      document.body.style.overflow = 'hidden';
+      say('');
+    }, function () { say('Final card nahi ban paya. Dobara try karo.'); });
+  });
+  $('fnClose').addEventListener('click', function () {
+    $('finalModal').hidden = true;
+    document.body.style.overflow = '';
+    $('finalImg').removeAttribute('src');
+  });
+
+  window.addEventListener('afterprint', function () {
+    document.body.classList.remove('printing');
+    $('printArea').innerHTML = '';
+  });
+
+  // ---------- remember where a photo was removed ----------
+  var lastImgSpot = null;
+  var lastTextSpot = null;
+  function saveSpot() {
+    try {
+      localStorage.removeItem('blankcard-lastspot');
+      if (lastImgSpot || lastTextSpot) localStorage.setItem('blankcard-lastspot2', JSON.stringify({ img: lastImgSpot, text: lastTextSpot }));
+      else localStorage.removeItem('blankcard-lastspot2');
+    } catch (e) {}
+  }
+  function validSpot(o) { return (o && isNum(o.x) && isNum(o.y)) ? { x: o.x, y: o.y } : null; }
+  function loadSpot() {
+    try {
+      var o = JSON.parse(localStorage.getItem('blankcard-lastspot2') || 'null');
+      if (o) { lastImgSpot = validSpot(o.img); lastTextSpot = validSpot(o.text); }
+      else { lastImgSpot = validSpot(JSON.parse(localStorage.getItem('blankcard-lastspot') || 'null')); }
+    } catch (e) {}
+  }
+
+  // ---------- crop dialog after choosing a photo ----------
+  var cm = null;
+  var cmPtr = {};
+  var cmPinch = null;
+  var cmDrag = null;
+  var CM_RATIO = { sq: 1, pass: 35 / 45, stamp: 20 / 25, p34: 3 / 4, l43: 4 / 3, l169: 16 / 9, wide: 3 };
+
+  function cmDims() {
+    var base = Math.max(cm.fw / cm.nw, cm.fh / cm.nh);
+    return { iw: cm.nw * base * cm.zoom, ih: cm.nh * base * cm.zoom };
+  }
+
+  function renderCm() {
+    var d = cmDims();
+    cm.ix = Math.min(0, Math.max(cm.fw - d.iw, cm.ix));
+    cm.iy = Math.min(0, Math.max(cm.fh - d.ih, cm.iy));
+    var im = $('cmImg');
+    im.style.width = d.iw + 'px';
+    im.style.height = d.ih + 'px';
+    im.style.left = cm.ix + 'px';
+    im.style.top = cm.iy + 'px';
+  }
+
+  function cmLayout(reset) {
+    var wrapW = Math.max(120, Math.min(300, $('cmBox').clientWidth - 40));
+    var r = cm.ratio;
+    if (r >= 1) { cm.fw = wrapW; cm.fh = wrapW / r; }
+    else { cm.fh = Math.min(300, wrapW); cm.fw = cm.fh * r; }
+    var fr = $('cmFrame');
+    fr.style.width = cm.fw + 'px';
+    fr.style.height = cm.fh + 'px';
+    if (reset) {
+      cm.zoom = 1;
+      var d = cmDims();
+      cm.ix = (cm.fw - d.iw) / 2;
+      cm.iy = (cm.fh - d.ih) / 2;
+      $('cmZoom').value = 100;
+    }
+    renderCm();
+  }
+
+  function cmFitOut() {
+    if (cm.outH > 638) { cm.outH = 638; cm.outW = Math.max(1, Math.round(638 * cm.ratio)); }
+    if (cm.outW > 1016) { cm.outW = 1016; cm.outH = Math.max(1, Math.round(1016 / cm.ratio)); }
+  }
+
+  function cmSetPreset(key) {
+    cm.preset = key;
+    if (key === 'free') cm.ratio = cm.nw / cm.nh;
+    else if (key === 'custom') cm.ratio = Math.max(0.1, Math.min(10, cm.outW / cm.outH));
+    else cm.ratio = CM_RATIO[key];
+    if (key !== 'custom') {
+      if (cm.ratio >= 1) { cm.outW = 300; cm.outH = Math.round(300 / cm.ratio); }
+      else { cm.outH = 300; cm.outW = Math.round(300 * cm.ratio); }
+      cmFitOut();
+    }
+    $('cmW').value = cm.outW;
+    $('cmH').value = cm.outH;
+    cmLayout(key !== 'custom');
+  }
+
+  function cmSizeChanged(which) {
+    var w = Number($('cmW').value), h = Number($('cmH').value);
+    if (!isFinite(w) || w < 20) w = cm.outW;
+    if (!isFinite(h) || h < 20) h = cm.outH;
+    w = Math.min(1016, w); h = Math.min(638, h);
+    if (cm.preset === 'custom') {
+      cm.outW = Math.round(w); cm.outH = Math.round(h);
+      cm.ratio = cm.outW / cm.outH;
+    } else if (which === 'w') {
+      cm.outW = Math.round(w); cm.outH = Math.max(1, Math.round(w / cm.ratio));
+      cmFitOut();
+    } else {
+      cm.outH = Math.round(h); cm.outW = Math.max(1, Math.round(h * cm.ratio));
+      cmFitOut();
+    }
+    $('cmW').value = cm.outW;
+    $('cmH').value = cm.outH;
+    if (cm.preset === 'custom') cmLayout(false);
+  }
+
+  function cmSetZoom(z) {
+    z = Math.max(1, Math.min(4, z));
+    var d = cmDims();
+    var u = (cm.fw / 2 - cm.ix) / d.iw, v = (cm.fh / 2 - cm.iy) / d.ih;
+    cm.zoom = z;
+    var d2 = cmDims();
+    cm.ix = cm.fw / 2 - u * d2.iw;
+    cm.iy = cm.fh / 2 - v * d2.ih;
+    $('cmZoom').value = Math.round(z * 100);
+    renderCm();
+  }
+
+  function openCrop(src, im, mime) {
+    cm = { src: src, im: im, mime: mime || '', nw: im.naturalWidth || 300, nh: im.naturalHeight || 300,
+           zoom: 1, ix: 0, iy: 0, fw: 100, fh: 100, ratio: 1, outW: 300, outH: 300, preset: 'free' };
+    $('cmImg').src = src;
+    var sel = $('cmWhere');
+    sel.innerHTML = '';
+    var o0 = document.createElement('option');
+    o0.value = 'auto'; o0.textContent = 'Card par seedha (apne aap jagah)';
+    sel.appendChild(o0);
+    locs.forEach(function (l) {
+      var o = document.createElement('option');
+      o.value = String(l.n); o.textContent = 'L' + l.n + '  (X ' + l.x + ', Y ' + l.y + ')';
+      sel.appendChild(o);
+    });
+    if (lastImgSpot) {
+      var oL = document.createElement('option');
+      oL.value = 'last';
+      oL.textContent = 'Jahan se hataya tha wahin (X ' + lastImgSpot.x + ', Y ' + lastImgSpot.y + ')';
+      sel.insertBefore(oL, sel.firstChild);
+    }
+    sel.value = lastImgSpot ? 'last' : 'auto';
+    $('cmPreset').value = 'free';
+    $('cropModal').hidden = false;
+    document.body.style.overflow = 'hidden';
+    cmSetPreset('free');
+  }
+
+  function closeCrop() {
+    $('cropModal').hidden = true;
+    document.body.style.overflow = '';
+    cmPtr = {}; cmPinch = null; cmDrag = null;
+    cm = null;
+    $('cmImg').removeAttribute('src');
+  }
+
+  $('cmPreset').addEventListener('change', function () { if (cm) cmSetPreset(this.value); });
+  $('cmW').addEventListener('change', function () { if (cm) cmSizeChanged('w'); });
+  $('cmH').addEventListener('change', function () { if (cm) cmSizeChanged('h'); });
+  $('cmZoom').addEventListener('input', function () { if (cm) cmSetZoom(Number(this.value) / 100); });
+  $('cmCancel').addEventListener('click', closeCrop);
+
+  var cmFrame = $('cmFrame');
+  cmFrame.addEventListener('pointerdown', function (e) {
+    if (!cm) return;
+    cmPtr[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ks = Object.keys(cmPtr);
+    if (ks.length === 2) {
+      var a = cmPtr[ks[0]], b = cmPtr[ks[1]];
+      cmPinch = { d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, z0: cm.zoom };
+      cmDrag = null;
+    } else {
+      cmDrag = { sx: e.clientX, sy: e.clientY, ix: cm.ix, iy: cm.iy };
+    }
+    try { cmFrame.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+  cmFrame.addEventListener('pointermove', function (e) {
+    if (!cm || !cmPtr[e.pointerId]) return;
+    cmPtr[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ks = Object.keys(cmPtr);
+    if (cmPinch && ks.length >= 2) {
+      var a = cmPtr[ks[0]], b = cmPtr[ks[1]];
+      cmSetZoom(cmPinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / cmPinch.d0);
+    } else if (cmDrag) {
+      cm.ix = cmDrag.ix + (e.clientX - cmDrag.sx);
+      cm.iy = cmDrag.iy + (e.clientY - cmDrag.sy);
+      renderCm();
+    }
+  });
+  function cmEnd(e) {
+    delete cmPtr[e.pointerId];
+    var n = Object.keys(cmPtr).length;
+    if (n < 2) cmPinch = null;
+    if (n === 0) cmDrag = null;
+  }
+  cmFrame.addEventListener('pointerup', cmEnd);
+  cmFrame.addEventListener('pointercancel', cmEnd);
+  cmFrame.addEventListener('wheel', function (e) {
+    if (!cm) return;
+    e.preventDefault();
+    cmSetZoom(cm.zoom + (e.deltaY < 0 ? 0.1 : -0.1));
+  }, { passive: false });
+
+  $('cmOk').addEventListener('click', function () {
+    if (!cm) return;
+    var d = cmDims();
+    var sx = Math.max(0, -cm.ix / d.iw * cm.nw);
+    var sy = Math.max(0, -cm.iy / d.ih * cm.nh);
+    var sw = Math.min(cm.nw - sx, cm.fw / d.iw * cm.nw);
+    var sh = Math.min(cm.nh - sy, cm.fh / d.ih * cm.nh);
+    var outW = cm.outW, outH = cm.outH;
+    var cw = Math.max(1, Math.min(Math.round(outW * 2), Math.round(sw), 1600));
+    var ch = Math.max(1, Math.round(cw * outH / outW));
+    var out;
+    try {
+      var cv = document.createElement('canvas');
+      cv.width = cw; cv.height = ch;
+      cv.getContext('2d').drawImage(cm.im, sx, sy, sw, sh, 0, 0, cw, ch);
+      out = cv.toDataURL(/jpe?g/i.test(cm.mime) ? 'image/jpeg' : 'image/png', 0.9);
+    } catch (err) {
+      say('Photo kaat nahi payi. Dusri photo try karo.');
+      return;
+    }
+    var where = $('cmWhere').value;
+    var n = items.length % 8;
+    var x = 40 + n * 24, y = 40 + n * 30;
+    if (where === 'last' && lastImgSpot) {
+      x = lastImgSpot.x; y = lastImgSpot.y;
+    } else if (where !== 'auto') {
+      var l = locs.filter(function (q) { return String(q.n) === where; })[0];
+      if (l) {
+        if (locMode === 'c') { x = l.x - outW / 2; y = l.y - outH / 2; }
+        else { x = l.x; y = l.y; }
+      }
+    }
+    var it = { type: 'img', src: out, w: outW, nw: cw, nh: ch, cl: 0, ct: 0, cr: 0, cb: 0, bw: 0, bc: '#000000', x: x, y: y, s: 1 };
+    clamp(it);
+    var lbl = where === 'last' ? ' (jahan se hataya tha wahin)' : (where !== 'auto' ? ' (L' + where + ' par)' : '');
+    if (where === 'last') { lastImgSpot = null; saveSpot(); }
+    closeCrop();
+    addItem(it);
+    say('Photo ' + outW + ' × ' + outH + ' px mein kat kar card par lag gayi' + lbl + '.');
+  });
+
+  function applyBorder(it, el) {
+    el = el || els[it.id];
+    var w = it.bw || 0;
+    el.style.border = 'none';
+    el.style.boxShadow = w > 0 ? ('0 0 0 ' + w + 'px ' + (it.bc || '#000000')) : 'none';
+    scheduleSave();
+    if (selected === it.id) syncCtl();
+  }
+
+  function setBw(v) {
+    var it = find(selected);
+    if (!it || it.type !== 'img') return;
+    it.bw = Math.max(0, Math.min(60, Math.round(v * 10) / 10));
+    applyBorder(it);
+  }
+  $('bwRange').addEventListener('input', function () { setBw(Number(this.value)); });
+  $('bwNum').addEventListener('change', function () {
+    var v = Number(this.value);
+    if (isFinite(v) && this.value !== '') setBw(v); else syncCtl();
+  });
+  function bwStep(d) {
+    var it = find(selected);
+    if (!it || it.type !== 'img') return;
+    setBw((it.bw || 0) + d);
+  }
+  $('bwM1').addEventListener('click', function () { bwStep(-1); });
+  $('bwM01').addEventListener('click', function () { bwStep(-0.1); });
+  $('bwP01').addEventListener('click', function () { bwStep(0.1); });
+  $('bwP1').addEventListener('click', function () { bwStep(1); });
+  $('bcColor').addEventListener('input', function () {
+    var it = find(selected);
+    if (!it || it.type !== 'img') return;
+    it.bc = this.value;
+    applyBorder(it);
+  });
+  setupColor({ pick: 'bcColor', hex: 'bcHex', save: 'bcSave', sw: 'bcSw', apply: function (c) {
+    var it = find(selected);
+    if (!it || it.type !== 'img') return;
+    it.bc = c;
+    applyBorder(it);
+  } });
+  $('bwAll').addEventListener('click', function () {
+    var cur = find(selected);
+    if (!cur || cur.type !== 'img') return;
+    var n = 0;
+    items.forEach(function (it) {
+      if (it.type === 'img') { it.bw = cur.bw || 0; it.bc = cur.bc || '#000000'; applyBorder(it); n++; }
+    });
+    say('Ye border ' + n + ' photo par laga diya.');
+  });
+
+  function step() {
+    var v = Number($('stepNum').value);
+    return (isFinite(v) && v > 0) ? v : 4;
+  }
+
+  function syncCtl() {
+    var it = find(selected);
+    if (!it) return;
+    var z = Math.round(it.s * 100);
+    $('sizeRange').value = z;
+    $('sizeNum').value = z;
+    $('posX').value = it.x;
+    $('posY').value = it.y;
+    var w, h, extra = '';
+    if (it.type === 'img') {
+      $('cropT').value = $('cropTn').value = Math.round(it.ct * 100);
+      $('cropB').value = $('cropBn').value = Math.round(it.cb * 100);
+      $('cropL').value = $('cropLn').value = Math.round(it.cl * 100);
+      $('cropR').value = $('cropRn').value = Math.round(it.cr * 100);
+      var ih = it.w * it.nh / it.nw;
+      $('bwRange').value = $('bwNum').value = it.bw || 0;
+      $('bcColor').value = it.bc || '#000000';
+      $('bcHex').value = (it.bc || '#000000').toUpperCase();
+      w = it.w * (1 - it.cl - it.cr) * it.s;
+      h = ih * (1 - it.ct - it.cb) * it.s;
+      extra = '  |  Border: ' + (it.bw || 0) + ' px';
+    } else {
+      var el = els[it.id];
+      w = el.offsetWidth * it.s;
+      h = el.offsetHeight * it.s;
+      extra = '  |  Akshar: ~' + Math.round(40 * it.s) + ' px';
+    }
+    $('infoLine').textContent = 'Card par size: ' + Math.round(w) + ' × ' + Math.round(h) + ' px  |  Zoom: ' + z + '%' + extra;
+  }
+
+  function setScale(it, s) {
+    it.s = Math.max(0.2, Math.min(4, Math.round(s * 100) / 100));
+    applyPos(it);
+    if (selected === it.id) $('sizeRange').value = Math.round(it.s * 100);
+  }
+  function size(d) {
+    var it = find(selected);
+    if (!it) return;
+    setScale(it, it.s + d);
+  }
+  $('sizeRange').addEventListener('input', function () {
+    var it = find(selected);
+    if (it) setScale(it, Number(this.value) / 100);
+  });
+
+  var CROP = { cropT: ['ct', 'cb'], cropB: ['cb', 'ct'], cropL: ['cl', 'cr'], cropR: ['cr', 'cl'] };
+  Object.keys(CROP).forEach(function (id) {
+    $(id).addEventListener('input', function () {
+      var it = find(selected);
+      if (!it || it.type !== 'img') return;
+      var mine = CROP[id][0], other = CROP[id][1];
+      it[mine] = Math.min(Number(this.value) / 100, 0.9 - it[other]);
+      this.value = Math.round(it[mine] * 100);
+      cropImg(it);
+    });
+  });
+  $('sizeNum').addEventListener('change', function () {
+    var it = find(selected);
+    if (!it) return;
+    var v = Number(this.value);
+    if (isFinite(v) && this.value !== '') setScale(it, v / 100);
+    syncCtl();
+  });
+  $('posX').addEventListener('change', function () {
+    var it = find(selected);
+    if (!it) return;
+    var v = Number(this.value);
+    if (isFinite(v) && this.value !== '') { it.x = v; clamp(it); applyPos(it); }
+    syncCtl();
+  });
+  $('posY').addEventListener('change', function () {
+    var it = find(selected);
+    if (!it) return;
+    var v = Number(this.value);
+    if (isFinite(v) && this.value !== '') { it.y = v; clamp(it); applyPos(it); }
+    syncCtl();
+  });
+  Object.keys(CROP).forEach(function (id) {
+    $(id + 'n').addEventListener('change', function () {
+      var it = find(selected);
+      if (!it || it.type !== 'img') return;
+      var mine = CROP[id][0], other = CROP[id][1];
+      var v = Number(this.value);
+      if (!isFinite(v) || this.value === '') { syncCtl(); return; }
+      it[mine] = Math.max(0, Math.min(v / 100, 0.8, 0.9 - it[other]));
+      cropImg(it);
+    });
+  });
+  $('cropReset').addEventListener('click', function () {
+    var it = find(selected);
+    if (!it || it.type !== 'img') return;
+    it.cl = it.ct = it.cr = it.cb = 0;
+    ['cropT', 'cropB', 'cropL', 'cropR'].forEach(function (id) { $(id).value = 0; });
+    cropImg(it);
+  });
+  $('nL').addEventListener('click', function () { move(-step(), 0); });
+  $('nR').addEventListener('click', function () { move(step(), 0); });
+  $('nU').addEventListener('click', function () { move(0, -step()); });
+  $('nD').addEventListener('click', function () { move(0, step()); });
+  $('sMinus').addEventListener('click', function () { size(-0.2); });
+  $('sPlus').addEventListener('click', function () { size(0.2); });
+  $('del').addEventListener('click', function () {
+    var id = selected;
+    if (id === null) return;
+    var gone = find(id);
+    if (gone && gone.type === 'img') {
+      lastImgSpot = { x: gone.x, y: gone.y };
+      saveSpot();
+      say('Photo hata di. Nayi photo chunoge to wahin lagegi (X ' + gone.x + ', Y ' + gone.y + ').');
+    } else if (gone && gone.type === 'text') {
+      lastTextSpot = { x: gone.x, y: gone.y };
+      saveSpot();
+      say('Text hata diya. Nayi text jodoge to wahin aayegi (X ' + gone.x + ', Y ' + gone.y + ').');
+    }
+    select(null);
+    card.removeChild(els[id]);
+    delete els[id];
+    items = items.filter(function (x) { return x.id !== id; });
+    scheduleSave();
+  });
+
+  card.addEventListener('pointerdown', function (e) {
+    pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+    if (Object.keys(pointers).length === 2 && selected !== null) {
+      var pts = Object.keys(pointers).map(function (k) { return pointers[k]; });
+      var sit = find(selected);
+      if (sit) {
+        pinch = { d0: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1, s0: sit.s };
+        drag = null;
+        e.preventDefault();
+        return;
+      }
+    }
+    var el = e.target.closest ? e.target.closest('.item') : null;
+    if (!el) { select(null); return; }
+    var id = Number(el.getAttribute('data-id'));
+    select(id);
+    var it = find(id);
+    drag = { id: id, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y };
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+  card.addEventListener('pointermove', function (e) {
+    if (pointers[e.pointerId]) { pointers[e.pointerId] = { x: e.clientX, y: e.clientY }; }
+    if (pinch) {
+      var ks = Object.keys(pointers);
+      var it0 = find(selected);
+      if (ks.length >= 2 && it0) {
+        var pa = pointers[ks[0]], pb = pointers[ks[1]];
+        setScale(it0, pinch.s0 * (Math.hypot(pa.x - pb.x, pa.y - pb.y) / pinch.d0));
+      }
+      return;
+    }
+    if (!drag) return;
+    var it = find(drag.id);
+    if (!it) return;
+    it.x = drag.ox + (e.clientX - drag.sx) / scale;
+    it.y = drag.oy + (e.clientY - drag.sy) / scale;
+    clamp(it); applyPos(it);
+  });
+  function endDrag(e) {
+    if (e && e.pointerId !== undefined) delete pointers[e.pointerId];
+    if (Object.keys(pointers).length < 2) pinch = null;
+    drag = null;
+  }
+  card.addEventListener('pointerup', endDrag);
+  card.addEventListener('pointercancel', endDrag);
+  card.addEventListener('wheel', function (e) {
+    if (!e.target.closest || !e.target.closest('.sel')) return;
+    var it = find(selected);
+    if (!it) return;
+    e.preventDefault();
+    setScale(it, it.s + (e.deltaY < 0 ? 0.1 : -0.1));
+  }, { passive: false });
+
+  function fitStage() {
+    var st = $('stage');
+    scale = Math.min(1, st.clientWidth / 1016);
+    $('scaler').style.transform = 'scale(' + scale + ')';
+    st.style.height = (638 * scale) + 'px';
+  }
+  window.addEventListener('resize', fitStage);
+
+  $('btnPrint').addEventListener('click', function () {
+    select(null);
+    if (cards.length === 1) printCards([0]); else openPick('pr');
+  });
+
+  $('btnImage').addEventListener('click', function () {
+    select(null);
+    if (cards.length === 1) downloadCards([0]); else openPick('dl');
+  });
+
+  $('btnPdf').addEventListener('click', function () {
+    select(null);
+    if (cards.length === 1) makePdf([0]); else openPick('pdf');
+  });
+
+  $('btnClear').addEventListener('click', function () {
+    select(null);
+    items.forEach(function (it) { card.removeChild(els[it.id]); });
+    items = []; els = {};
+    scheduleSave();
+    say(cname(curCard) + ' khaali ho gaya.');
+  });
+
+  load3dPick();
+  restore();
+  renderCardTabs();
+  fit3d();
+  apply3d(false);
+  resetHistory();
+  loadSpot();
+  loadLocs();
+  $('anchorSel').value = locMode;
+  renderLocs();
+  refreshNums();
+  fitStage();
+</script>
+</body>
+</html>
